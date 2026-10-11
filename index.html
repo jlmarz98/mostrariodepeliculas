@@ -1,0 +1,408 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Películas - Estilo Netflix</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #141414;
+            color: #ffffff;
+            padding: 20px 30px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #E50914;
+            font-size: 3rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header h2 {
+            font-size: 3rem;
+            color: #b3b3b3;
+            font-weight: normal;
+        }
+
+        .btn-primary {
+            background-color: #E50914;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: #f40612;
+        }
+
+        /* CONFIGURACIÓN PARA 6 PÓSTERS EN UNA SOLA FILA HORIZONTAL */
+        .movie-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .movie-card {
+            background-color: #2f2f2f;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .movie-card:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+
+        .movie-poster {
+            width: 100%;
+            height: 260px; /* Altura ideal para 6 columnas */
+            object-fit: cover;
+            background-color: #000;
+        }
+
+        .movie-info {
+            padding: 10px;
+        }
+
+        .movie-title {
+            font-size: 0.95rem;
+            font-weight: bold;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .movie-year {
+            color: #46d369;
+            font-weight: bold;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+        }
+
+        .movie-desc {
+            color: #b3b3b3;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* Máximo 2 líneas para mantener el diseño limpio */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .movie-actions {
+            display: flex;
+            gap: 6px;
+            padding: 0 10px 10px 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            padding: 6px 4px;
+            border: none;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-edit {
+            background-color: rgba(109, 109, 110, 0.7);
+            color: white;
+        }
+
+        .btn-edit:hover {
+            background-color: rgba(109, 109, 110, 0.9);
+        }
+
+        .btn-delete {
+            background-color: rgba(229, 9, 20, 0.3);
+            color: #ff4d4d;
+        }
+
+        .btn-delete:hover {
+            background-color: rgba(229, 9, 20, 0.6);
+            color: white;
+        }
+
+        /* Estilos del Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background-color: #181818;
+            padding: 30px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #b3b3b3;
+        }
+
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background-color: #333;
+            border: 1px solid #444;
+            color: white;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel {
+            background-color: #333;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-cancel:hover {
+            background-color: #444;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <h1>CARTELERA PARA CINEFILOS</h1>
+            <h2>Estrenos recientes — 
+            Adquiere tus películas por la mínima cantidad 3500 pesos</h2>
+        </div>
+        <button class="btn-primary" onclick="abrirModal()">+ Subir Película</button>
+    </header>
+
+    <main class="movie-grid" id="movieGrid">
+        <!-- Las películas se cargarán aquí dinámicamente -->
+    </main>
+
+    <!-- Modal para Agregar / Editar Película -->
+    <div class="modal" id="movieModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Subir Nueva Película</h2>
+            <form id="movieForm" onsubmit="guardarPelicula(event)">
+                <input type="hidden" id="movieId">
+                <div class="form-group">
+                    <label for="titulo">Título</label>
+                    <input type="text" id="titulo" required>
+                </div>
+                <div class="form-group">
+                    <label for="anio">Año y Clasificación (Ej: 2022 • TV-MA)</label>
+                    <input type="text" id="anio" required>
+                </div>
+                <div class="form-group">
+                    <label for="imagen">URL del Poster (Imagen)</label>
+                    <input type="url" id="imagen" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" required></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary" style="padding: 10px 20px; font-size: 1rem;">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let peliculas = JSON.parse(localStorage.getItem('peliculas')) || [
+            {
+                id: 1,
+                titulo: "Stranger Things",
+                anio: "2022 • TV-MA",
+                imagen: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
+                descripcion: "Cuando un niño desaparece, un pueblo pequeño descubre un misterio."
+            },
+            {
+                id: 2,
+                titulo: "Interestelar",
+                anio: "2014 • PG-13",
+                imagen: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+                descripcion: "Científicos viajan a través de un agujero de gusano."
+            },
+            {
+                id: 3,
+                titulo: "Avatar 2",
+                anio: "2022 • PG-13",
+                imagen: "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+                descripcion: "Jake Sully vive con su nueva familia en Pandora."
+            },
+            {
+                id: 4,
+                titulo: "Batman",
+                anio: "2022 • PG-13",
+                imagen: "https://image.tmdb.org/t/p/w500/74xTEgt7R36Fpooo50r9T25onhq.jpg",
+                descripcion: "Batman descubre la corrupción en Gotham City."
+            },
+            {
+                id: 5,
+                titulo: "Spider-Man",
+                anio: "2023 • PG",
+                imagen: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg",
+                descripcion: "Miles Morales a través del Multiverso."
+            },
+            {
+                id: 6,
+                titulo: "Oppenheimer",
+                anio: "2023 • R",
+                imagen: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+                descripcion: "La historia del físico J. Robert Oppenheimer."
+            }
+        ];
+
+        const movieGrid = document.getElementById('movieGrid');
+        const movieModal = document.getElementById('movieModal');
+        const movieForm = document.getElementById('movieForm');
+        const modalTitle = document.getElementById('modalTitle');
+
+        function renderizarPeliculas() {
+            movieGrid.innerHTML = '';
+            peliculas.forEach(pelicula => {
+                const card = document.createElement('div');
+                card.className = 'movie-card';
+                card.innerHTML = `
+                    <img src="${pelicula.imagen}" alt="${pelicula.titulo}" class="movie-poster" onerror="this.src='https://via.placeholder.com/500x750?text=Sin+Imagen'">
+                    <div class="movie-info">
+                        <div class="movie-title" title="${pelicula.titulo}">${pelicula.titulo}</div>
+                        <div class="movie-year">${pelicula.anio}</div>
+                        <div class="movie-desc">${pelicula.descripcion}</div>
+                    </div>
+                    <div class="movie-actions">
+                        <button class="btn-action btn-edit" onclick="editarPelicula(${pelicula.id})">Editar</button>
+                        <button class="btn-action btn-delete" onclick="borrarPelicula(${pelicula.id})">Borrar</button>
+                    </div>
+                `;
+                movieGrid.appendChild(card);
+            });
+            localStorage.setItem('peliculas', JSON.stringify(peliculas));
+        }
+
+        function abrirModal() {
+            document.getElementById('movieId').value = '';
+            movieForm.reset();
+            modalTitle.textContent = 'Subir Nueva Película';
+            movieModal.style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            movieModal.style.display = 'none';
+        }
+
+        function guardarPelicula(event) {
+            event.preventDefault();
+            const id = document.getElementById('movieId').value;
+            const titulo = document.getElementById('titulo').value;
+            const anio = document.getElementById('anio').value;
+            const imagen = document.getElementById('imagen').value;
+            const descripcion = document.getElementById('descripcion').value;
+
+            if (id) {
+                peliculas = peliculas.map(p => p.id == id ? { id: Number(id), titulo, anio, imagen, descripcion } : p);
+            } else {
+                const nuevaPelícula = {
+                    id: Date.now(),
+                    titulo,
+                    anio,
+                    imagen,
+                    descripcion
+                };
+                peliculas.push(nuevaPelícula);
+            }
+
+            cerrarModal();
+            renderizarPeliculas();
+        }
+
+        function editarPelicula(id) {
+            const pelicula = peliculas.find(p => p.id === id);
+            if (pelicula) {
+                document.getElementById('movieId').value = pelicula.id;
+                document.getElementById('titulo').value = pelicula.titulo;
+                document.getElementById('anio').value = pelicula.anio;
+                document.getElementById('imagen').value = pelicula.imagen;
+                document.getElementById('descripcion').value = pelicula.descripcion;
+                
+                modalTitle.textContent = 'Editar Película';
+                movieModal.style.display = 'flex';
+            }
+        }
+
+        function borrarPelicula(id) {
+            if (confirm('¿Estás seguro de que deseas eliminar esta película?')) {
+                peliculas = peliculas.filter(p => p.id !== id);
+                renderizarPeliculas();
+            }
+        }
+
+        renderizarPeliculas();
+    </script>
+</body>
+</html>
