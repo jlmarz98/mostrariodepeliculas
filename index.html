@@ -3,488 +3,1135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Películas - Estilo Netflix</title>
+    <title>Raptor Games - Publicidad y Servicios</title>
     <style>
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Helvetica Neue', Arial, sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         body {
             background-color: #141414;
             color: #ffffff;
-            padding: 20px 30px;
+            padding-bottom: 50px;
+            overflow-x: hidden;
         }
 
-        header {
+        /* Barra de Navegación Adaptable con Menú Hamburguesa */
+        .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            background: linear-gradient(180deg, #1f1f1f 0%, #0d0d0d 100%);
+            padding: 12px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 3px solid #E50914;
+            box-shadow: 0 4px 20px rgba(229, 9, 20, 0.25);
         }
 
-        h1 {
-            color: #E50914;
-            font-size: 3rem;
+        .nav-left-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .nav-logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00d2ff;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        .nav-brand-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-brand {
+            color: #00d2ff;
+            font-size: clamp(1rem, 1.8vw, 1.3rem);
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
 
-        header h2 {
-            font-size: 1.5rem;
+        .nav-subtitle {
             color: #b3b3b3;
+            font-size: clamp(0.65rem, 1vw, 0.8rem);
             font-weight: normal;
+            letter-spacing: 0.3px;
         }
 
-        .btn-primary {
+        /* Enlaces de Navegación por Defecto (Desktop / TV) */
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .nav-link, .btn-auth-nav, .btn-admin-nav {
+            font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+        }
+
+        .nav-link {
+            color: #b3b3b3;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: color 0.2s;
+            padding: 5px;
+        }
+
+        .nav-link:hover, .nav-link.active, .nav-link:focus {
+            color: #fff;
+            outline: 2px solid #E50914;
+        }
+
+        .btn-auth-nav, .btn-admin-nav {
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-auth-nav {
             background-color: #E50914;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
         }
 
-        .btn-primary:hover {
+        .btn-auth-nav:hover, .btn-auth-nav:focus {
             background-color: #f40612;
+            outline: 3px solid #fff;
         }
 
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
+        .btn-admin-nav {
+            background-color: #2b2b2b;
+            color: #ffcc00;
+            border: 1px solid #ffcc00;
+        }
+
+        .btn-admin-nav:hover, .btn-admin-nav:focus {
+            background-color: #3d3d3d;
+            outline: 3px solid #ffcc00;
+        }
+
+        /* Botón de Menú Hamburguesa (Oculto en Escritorio) */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.8rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* Estilos Responsive para Celulares */
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: block;
+            }
+
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(13, 13, 13, 0.98);
+                padding: 20px;
+                border-bottom: 3px solid #E50914;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.8);
+                gap: 15px;
+                align-items: stretch;
+                text-align: center;
+            }
+
+            .nav-links.activo {
+                display: flex;
+            }
+
+            .btn-admin-nav, .btn-auth-nav {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+
+        /* Contenedores de Vista */
+        .seccion-vista {
+            display: none;
+            padding: 25px 3%;
+        }
+
+        .seccion-vista.activa {
+            display: block;
+        }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
             width: 100%;
         }
 
-        @media (max-width: 1400px) {
-            .movie-grid { grid-template-columns: repeat(4, 1fr); }
-        }
-        @media (max-width: 900px) {
-            .movie-grid { grid-template-columns: repeat(2, 1fr); }
+        /* DISTRIBUCIÓN DE CARRUSELES RESPONSIVE */
+        .carruseles-layout-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            width: 100%;
         }
 
-        .movie-card {
-            background-color: #2f2f2f;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease;
+        .carrusel-bloque-full {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 1024px) {
+            .carruseles-layout-container {
+                grid-template-columns: 1fr;
+            }
+            .carrusel-bloque-full {
+                grid-column: span 1;
+            }
+        }
+
+        .carrusel-bloque {
+            background: #181818;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .carrusel-titulo {
+            font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+            margin-bottom: 15px;
+            color: #e5e5e5;
+            font-weight: bold;
+            border-bottom: 2px solid #E50914;
+            padding-bottom: 8px;
+        }
+
+        /* Flechas Flotantes en Carruseles */
+        .carrusel-wrapper {
+            position: relative;
             display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
         }
 
-        .movie-card:hover {
-            transform: scale(1.05);
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.85);
+            color: white;
+            border: 2px solid #444;
+            font-size: 1.5rem;
+            padding: 15px 10px;
+            cursor: pointer;
+            z-index: 20;
+            border-radius: 6px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+
+        .carousel-btn:hover, .carousel-btn:focus {
+            background-color: #E50914;
+            border-color: #fff;
+            outline: none;
+        }
+
+        .btn-left { left: -15px; }
+        .btn-right { right: -15px; }
+
+        @media (max-width: 768px) {
+            .carousel-btn { display: none; }
+        }
+
+        .carrusel-fila {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto;
+            padding: 10px 5px;
+            scroll-behavior: smooth;
+            width: 100%;
+            scrollbar-width: thin;
+            scrollbar-color: #E50914 #222;
+        }
+
+        .carrusel-fila::-webkit-scrollbar {
+            height: 8px;
+        }
+        .carrusel-fila::-webkit-scrollbar-thumb {
+            background: #E50914;
+            border-radius: 4px;
+        }
+
+        /* Tarjetas Adaptables */
+        .tarjeta-carrusel {
+            min-width: 180px;
+            max-width: 220px;
+            flex: 0 0 auto;
+            background: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+
+        .tarjeta-carrusel:hover, .tarjeta-carrusel:focus {
+            transform: scale(1.08);
             z-index: 10;
+            outline: 3px solid #E50914;
         }
 
-        .poster-container {
+        .contenedor-imagen-hover {
             position: relative;
             width: 100%;
-            height: 260px;
+            aspect-ratio: 2/3;
+            overflow: hidden;
+            background: #000;
         }
 
-        .movie-poster {
+        .contenedor-imagen-hover img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            background-color: #000;
-        }
-
-        .play-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
 
-        .poster-container:hover .play-overlay {
+        .img-principal { opacity: 1; z-index: 1; }
+        .img-hover { opacity: 0; z-index: 2; }
+
+        .tarjeta-carrusel:hover .img-hover,
+        .tarjeta-carrusel:focus .img-hover {
             opacity: 1;
         }
 
-        .btn-play {
-            background-color: #E50914;
-            color: white;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-            transition: transform 0.2s;
-        }
-
-        .btn-play:hover {
-            transform: scale(1.1);
-        }
-
-        .movie-info {
+        .tarjeta-carrusel-titulo {
             padding: 10px;
-        }
-
-        .movie-title {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-        }
-
-        .movie-year {
-            color: #46d369;
-            font-weight: bold;
-            margin-bottom: 6px;
-            font-size: 0.8rem;
-        }
-
-        .movie-desc {
-            color: #b3b3b3;
-            font-size: 0.75rem;
-            line-height: 1.2;
-            margin-bottom: 10px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
-        .movie-actions {
-            display: flex;
-            gap: 5px;
-            padding: 0 10px 10px 10px;
-        }
-
-        .btn-action {
-            flex: 1;
-            padding: 6px 2px;
-            border: none;
-            border-radius: 3px;
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
             text-align: center;
         }
 
-        .btn-watch {
-            background-color: #E50914;
-            color: white;
-        }
-        .btn-watch:hover { background-color: #f40612; }
-
-        .btn-edit {
-            background-color: rgba(109, 109, 110, 0.7);
-            color: white;
-        }
-        .btn-edit:hover { background-color: rgba(109, 109, 110, 0.9); }
-
-        .btn-delete {
-            background-color: rgba(229, 9, 20, 0.3);
-            color: #ff4d4d;
-        }
-        .btn-delete:hover { background-color: rgba(229, 9, 20, 0.6); color: white; }
-
-        /* Estilos de Modales */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* Formularios Auth y Modales Adaptables */
+        .caja-auth {
+            max-width: 420px;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.85);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .modal-content {
-            background-color: #181818;
+            margin: 40px auto;
+            background: #181818;
             padding: 30px;
             border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
+        }
+
+        .grupo-campo { margin-bottom: 15px; }
+        .grupo-campo label { display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem; }
+        .grupo-campo input, .grupo-campo select, .grupo-campo textarea { 
+            width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; border-radius: 4px; font-size: 1rem;
+        }
+        .grupo-campo input:focus, .grupo-campo select:focus, .grupo-campo textarea:focus {
+            border-color: #E50914;
+            outline: none;
+        }
+
+        .btn-rojo {
             width: 100%;
-            max-width: 500px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-        }
-
-        .modal-content h2 {
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #b3b3b3;
-        }
-
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 10px;
-            background-color: #333;
-            border: 1px solid #444;
+            background-color: #E50914;
             color: white;
+            border: none;
+            padding: 12px;
+            font-weight: bold;
             border-radius: 4px;
+            cursor: pointer;
             font-size: 1rem;
         }
+        .btn-rojo:hover, .btn-rojo:focus { background-color: #f40612; outline: 2px solid #fff; }
 
-        .form-group textarea {
-            resize: vertical;
-            height: 80px;
+        /* Catálogo de Estrenos Grid */
+        .grid-estrenos {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 20px;
         }
 
-        .modal-actions {
+        @media (min-width: 768px) {
+            .grid-estrenos {
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            }
+        }
+
+        .tarjeta-estreno {
+            background-color: #1f1f1f;
+            border-radius: 6px;
+            overflow: hidden;
             display: flex;
-            justify-content: flex-end;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .tarjeta-estreno img {
+            width: 100%;
+            aspect-ratio: 2/3;
+            object-fit: cover;
+            background: #000;
+        }
+
+        .tarjeta-estreno-info { padding: 12px; }
+        .tarjeta-estreno-titulo { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
+        .tarjeta-estreno-meta { font-size: 0.8rem; color: #46d369; font-weight: bold; margin-bottom: 6px; }
+        .tarjeta-estreno-desc { font-size: 0.8rem; color: #b3b3b3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
+        .tarjeta-estreno-botones { display: flex; gap: 5px; padding: 0 12px 12px 12px; }
+        
+        .btn-tarjeta { flex: 1; padding: 10px; border: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold; cursor: pointer; }
+        .btn-ver-estreno { background-color: #E50914; color: white; }
+        .btn-borrar-estreno { background-color: #333; color: #ff4d4d; }
+
+        /* Panel Admin Tabs y Tablas */
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: #222;
+            color: #b3b3b3;
+            border: 1px solid #444;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+
+        .tab-btn.active, .tab-btn:focus {
+            background: #E50914;
+            color: white;
+            border-color: #E50914;
+            outline: none;
+        }
+
+        .tab-content {
+            display: none;
+            background: #181818;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+        }
+
+        .tab-content.active { display: block; }
+
+        .tabla-admin {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            min-width: 500px;
+        }
+
+        .tabla-admin th, .tabla-admin td {
+            border: 1px solid #333;
+            padding: 12px;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .tabla-admin th { background: #222; color: #E50914; }
+        .tabla-admin tr:nth-child(even) { background: #1f1f1f; }
+
+        .lista-items-admin {
+            display: flex;
+            flex-direction: column;
             gap: 10px;
             margin-top: 20px;
         }
 
-        .btn-cancel {
-            background-color: #333;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .btn-cancel:hover { background-color: #444; }
-
-        /* Modal Reproductor */
-        .video-modal-content {
-            background-color: #000;
-            padding: 20px;
-            border-radius: 8px;
-            width: 90%;
-            max-width: 900px;
-            position: relative;
+        .item-row-admin {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            background: #222;
+            padding: 10px 15px;
+            border-radius: 4px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
-        video {
-            width: 100%;
-            max-height: 70vh;
-            outline: none;
-            background: #000;
+        .item-info-admin {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .close-video {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: #E50914;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        .item-info-admin img {
+            width: 45px;
+            height: 65px;
+            object-fit: cover;
+            border-radius: 3px;
+        }
+
+        /* Modales Adaptables */
+        .modal-fondo {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            justify-content: center; align-items: center;
+            z-index: 2000;
+            padding: 15px;
+        }
+
+        .modal-caja { 
+            background: #181818; 
+            padding: 25px; 
+            border-radius: 8px; 
+            width: 100%; 
+            max-width: 500px; 
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .reproductor-caja { 
+            background: #000; 
+            padding: 20px; 
+            border-radius: 8px; 
+            width: 100%; 
+            max-width: 950px; 
+            position: relative; 
+        }
+
+        .reproductor-contenedor { 
+            width: 100%; 
+            aspect-ratio: 16/9; 
+            background: #000; 
+        }
+
+        .reproductor-contenedor iframe, .reproductor-contenedor video { 
+            width: 100%; 
+            height: 100%; 
+            border: none; 
+        }
+        
+        .cerrar-modal {
+            position: absolute; top: 10px; right: 10px; background: #E50914; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; z-index: 10;
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div>
-            <h1>CARTELERA PARA CINEFILOS</h1>
-            <h2>Estrenos recientes — Adquiere tus películas por la mínima cantidad 3500 pesos</h2>
+    <!-- BARRA DE NAVEGACIÓN -->
+    <div class="navbar">
+        <div class="nav-left-group">
+            <img src="logo raptor games.jpg" alt="Logo Raptor Games" class="nav-logo">
+            <div class="nav-brand-container">
+                <div class="nav-brand">Publicidad y Servicios</div>
+                <div class="nav-subtitle">El mejor contenido de entretenimiento al mejor precio</div>
+            </div>
+            <button class="btn-admin-nav" onclick="verificarAccesoAdmin()" tabindex="0" style="margin-left: 10px;">⚙️ Admin</button>
         </div>
-        <button class="btn-primary" onclick="abrirModal()">+ Subir Película</button>
-    </header>
 
-    <main class="movie-grid" id="movieGrid">
-        <!-- Las películas se cargarán aquí dinámicamente -->
-    </main>
+        <!-- Botón de Menú Hamburguesa para Celulares -->
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir Menú">☰</button>
 
-    <!-- Modal para Agregar / Editar Película -->
-    <div class="modal" id="movieModal">
-        <div class="modal-content">
-            <h2 id="modalTitle">Subir Nueva Película</h2>
-            <form id="movieForm" onsubmit="guardarPelicula(event)">
-                <input type="hidden" id="movieId">
-                <div class="form-group">
-                    <label for="titulo">Título</label>
-                    <input type="text" id="titulo" required>
+        <!-- Enlaces de Navegación -->
+        <div class="nav-links" id="navLinks">
+            <span class="nav-link active" onclick="mostrarVista('inicio'); cerrarMenuMovil();" tabindex="0">Inicio</span>
+            <span class="nav-link" onclick="accederEstrenos(); cerrarMenuMovil();" tabindex="0">Estrenos</span>
+            <button class="btn-auth-nav" id="btnSesion" onclick="accionBotonSesion(); cerrarMenuMovil();" tabindex="0">Iniciar Sesión</button>
+        </div>
+    </div>
+
+    <!-- VISTA 1: INICIO -->
+    <div id="vistaInicio" class="seccion-vista activa">
+        <div class="main-container">
+            <div class="carruseles-layout-container">
+                
+                <!-- Carrusel 1 -->
+                <div class="carrusel-bloque">
+                    <div class="carrusel-titulo">📺 Series Nuevas</div>
+                    <div class="carrusel-wrapper">
+                        <button class="carousel-btn btn-left" onclick="moverCarrusel('filaSeries', -300)">&#10094;</button>
+                        <div class="carrusel-fila" id="filaSeries"></div>
+                        <button class="carousel-btn btn-right" onclick="moverCarrusel('filaSeries', 300)">&#10095;</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="anio">Año y Clasificación (Ej: 2022 • TV-MA)</label>
-                    <input type="text" id="anio" required>
+
+                <!-- Carrusel 2 -->
+                <div class="carrusel-bloque">
+                    <div class="carrusel-titulo">🎬 Películas de Estreno</div>
+                    <div class="carrusel-wrapper">
+                        <button class="carousel-btn btn-left" onclick="moverCarrusel('filaEstrenosHome', -300)">&#10094;</button>
+                        <div class="carrusel-fila" id="filaEstrenosHome"></div>
+                        <button class="carousel-btn btn-right" onclick="moverCarrusel('filaEstrenosHome', 300)">&#10095;</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="imagen">URL del Póster (Imagen)</label>
-                    <input type="url" id="imagen" required>
+
+                <!-- Carrusel 3 (Inferior) -->
+                <div class="carrusel-bloque carrusel-bloque-full">
+                    <div class="carrusel-titulo">🍿 Viejas pero Buenas</div>
+                    <div class="carrusel-wrapper">
+                        <button class="carousel-btn btn-left" onclick="moverCarrusel('filaClasicas', -400)">&#10094;</button>
+                        <div class="carrusel-fila" id="filaClasicas"></div>
+                        <button class="carousel-btn btn-right" onclick="moverCarrusel('filaClasicas', 400)">&#10095;</button>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label for="videoUrl">URL del Archivo de Video (Ej: .mp4)</label>
-                    <input type="url" id="videoUrl" placeholder="https://ejemplo.com/video.mp4" required>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA 2: LOGIN / REGISTRO -->
+    <div id="vistaAuth" class="seccion-vista">
+        <div class="main-container">
+            <div class="caja-auth">
+                <h2 id="tituloAuth" style="margin-bottom: 20px;">Iniciar Sesión</h2>
+                <form onsubmit="procesarAuth(event)">
+                    <div class="grupo-campo">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="authEmail" required>
+                    </div>
+                    <div class="grupo-campo">
+                        <label>Contraseña</label>
+                        <input type="password" id="authPass" required>
+                    </div>
+                    <button type="submit" class="btn-rojo" id="btnAuthSubmit">Entrar</button>
+                </form>
+                <div class="texto-cambio-auth" id="textoAuthSwitch" style="margin-top: 15px; text-align: center; font-size: 0.9rem; color: #b3b3b3;">
+                    ¿No tienes cuenta? <span onclick="modoFormulario('registro')" style="color:#fff; cursor:pointer; text-decoration:underline;">Regístrate aquí</span>
                 </div>
-                <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea id="descripcion" required></textarea>
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
-                    <button type="submit" class="btn-primary" style="padding: 10px 20px; font-size: 1rem;">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VISTA 3: PELÍCULAS DE ESTRENO -->
+    <div id="vistaEstrenos" class="seccion-vista">
+        <div class="main-container">
+            <div class="estrenos-encabezado" style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+                <h1 style="color: #E50914; font-size: clamp(1.5rem, 2.5vw, 2.2rem);">Películas de Estreno</h1>
+                <p style="color: #b3b3b3; margin-top: 5px;">Catálogo exclusivo de lanzamientos recientes</p>
+            </div>
+            <div class="grid-estrenos" id="gridEstrenos"></div>
+        </div>
+    </div>
+
+    <!-- VISTA 4: PANEL DE ADMINISTRACIÓN -->
+    <div id="vistaAdmin" class="seccion-vista">
+        <div class="main-container">
+            <div class="admin-header" style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+                <h1 style="color: #E50914; font-size: clamp(1.5rem, 2.5vw, 2.2rem);">Panel de Administración</h1>
+                <p style="color: #b3b3b3;">Gestiona carruseles, películas y usuarios registrados</p>
+            </div>
+
+            <div class="admin-tabs">
+                <button class="tab-btn active" onclick="cambiarTabAdmin('tabCarruseles')">🖼️ Carruseles</button>
+                <button class="tab-btn" onclick="cambiarTabAdmin('tabEstrenosAdmin')">🎬 Estrenos</button>
+                <button class="tab-btn" onclick="cambiarTabAdmin('tabUsuarios')">👥 Usuarios</button>
+            </div>
+
+            <!-- TAB 1: GESTIÓN DE CARRUSELES -->
+            <div id="tabCarruseles" class="tab-content active">
+                <h3>Subir / Editar Elemento en Carrusel</h3>
+                <form onsubmit="guardarItemCarrusel(event)" style="margin-top: 15px; max-width: 500px;">
+                    <input type="hidden" id="carruselEditId">
+                    <div class="grupo-campo">
+                        <label>Seleccionar Carrusel Destino</label>
+                        <select id="carruselTipo">
+                            <option value="series">📺 Series Nuevas</option>
+                            <option value="estrenosHome">🎬 Películas de Estreno</option>
+                            <option value="clasicas">🍿 Viejas pero Buenas</option>
+                        </select>
+                    </div>
+                    <div class="grupo-campo"><label>Título</label><input type="text" id="carruselTitulo" required></div>
+                    <div class="grupo-campo"><label>URL Imagen Principal</label><input type="text" id="carruselImgPrincipal" required></div>
+                    <div class="grupo-campo"><label>URL Imagen Hover</label><input type="text" id="carruselImgHover" required></div>
+                    <button type="submit" class="btn-rojo" style="width: auto; padding: 10px 20px;">Guardar en Carrusel</button>
+                </form>
+
+                <h3 style="margin-top: 30px;">Elementos en Carruseles</h3>
+                <div class="lista-items-admin" id="listaCarruselesAdmin"></div>
+            </div>
+
+            <!-- TAB 2: GESTIÓN DE ESTRENOS -->
+            <div id="tabEstrenosAdmin" class="tab-content">
+                <h3>Lista de Películas de Estreno</h3>
+                <button class="btn-rojo" style="width: auto; padding: 10px 20px; margin-top: 15px;" onclick="abrirModalSubir()">+ Nueva Película</button>
+                <div class="lista-items-admin" id="listaEstrenosAdmin"></div>
+            </div>
+
+            <!-- TAB 3: GESTIÓN DE USUARIOS -->
+            <div id="tabUsuarios" class="tab-content">
+                <h3>Lista de Usuarios Registrados y Contraseñas</h3>
+                <table class="tabla-admin">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Correo Electrónico</th>
+                            <th>Contraseña</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaUsuariosBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SUBIR / EDITAR -->
+    <div class="modal-fondo" id="modalSubir">
+        <div class="modal-caja">
+            <h2 style="margin-bottom: 15px;" id="modalSubirTitulo">Subir Nueva Película</h2>
+            <form onsubmit="guardarPelicula(event)">
+                <input type="hidden" id="editEstrenoId">
+                <div class="grupo-campo"><label>Título</label><input type="text" id="inputTitulo" required></div>
+                <div class="grupo-campo"><label>Año / Categoría</label><input type="text" id="inputMeta" required></div>
+                <div class="grupo-campo"><label>URL Imagen Póster</label><input type="text" id="inputImagen" required></div>
+                <div class="grupo-campo"><label>Enlace Drive o MP4</label><input type="text" id="inputVideo" required></div>
+                <div class="grupo-campo"><label>Descripción</label><textarea id="inputDesc" required rows="3"></textarea></div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                    <button type="button" class="btn-rojo" style="background:#444; width: auto;" onclick="cerrarModalSubir()">Cancelar</button>
+                    <button type="submit" class="btn-rojo" style="width: auto;">Guardar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal para Reproducir Video -->
-    <div class="modal" id="videoModal">
-        <div class="video-modal-content">
-            <button class="close-video" onclick="cerrarReproductor()">×</button>
-            <h3 id="videoTitle" style="margin-bottom: 15px; color: #fff;">Reproduciendo</h3>
-            <video id="videoPlayer" controls autoplay>
-                Tu navegador no soporta la reproducción de video.
-            </video>
+    <!-- MODAL REPRODUCTOR -->
+    <div class="modal-fondo" id="modalReproductor">
+        <div class="reproductor-caja">
+            <button class="cerrar-modal" onclick="cerrarReproductor()">×</button>
+            <h3 id="tituloReproductor" style="margin-bottom: 10px; font-size: 1.2rem;">Reproduciendo</h3>
+            <div class="reproductor-contenedor" id="contenedorReproductor"></div>
         </div>
     </div>
 
     <script>
-        let peliculasGuardadas = JSON.parse(localStorage.getItem('peliculas')) || [];
-        
-        let peliculas = peliculasGuardadas.map(p => ({
-            ...p,
-            videoUrl: p.videoUrl || "https://www.w3schools.com/html/mov_bbb.mp4"
-        }));
+        const CLAVE_ADMIN_SECRETA = "admin2026";
+        let esAdminAutenticado = false;
 
-        const movieGrid = document.getElementById('movieGrid');
-        const movieModal = document.getElementById('movieModal');
-        const movieForm = document.getElementById('movieForm');
-        const modalTitle = document.getElementById('modalTitle');
-        const videoModal = document.getElementById('videoModal');
-        const videoPlayer = document.getElementById('videoPlayer');
-        const videoTitle = document.getElementById('videoTitle');
+        let carruselesData = JSON.parse(localStorage.getItem('carruseles_db')) || {
+            series: [
+                { id: 101, titulo: "Cyber Edge", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
+            ],
+            estrenosHome: [
+                { id: 102, titulo: "Animales", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
+            ],
+            clasicas: [
+                { id: 103, titulo: "Big Buck Bunny", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
+            ]
+        };
 
-        function renderizarPeliculas() {
-            movieGrid.innerHTML = '';
-            peliculas.forEach(pelicula => {
-                const card = document.createElement('div');
-                card.className = 'movie-card';
-                card.innerHTML = `
-                    <div class="poster-container">
-                        <img src="${pelicula.imagen}" alt="${pelicula.titulo}" class="movie-poster" onerror="this.src='https://via.placeholder.com/500x750?text=Sin+Imagen'">
-                        <div class="play-overlay">
-                            <button class="btn-play" onclick="reproducirPelicula('${pelicula.videoUrl}', '${pelicula.titulo.replace(/'/g, "\\'")}')">▶ Reproducir</button>
+        let peliculasEstreno = JSON.parse(localStorage.getItem('estrenos_db')) || [
+            {
+                id: 1,
+                titulo: "Animales (Estreno)",
+                meta: "2026 • Suspense",
+                imagen: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
+                video: "https://www.w3schools.com/html/mov_bbb.mp4",
+                desc: "Película de estreno en formato MP4 o Google Drive."
+            }
+        ];
+
+        let dbUsuarios = JSON.parse(localStorage.getItem('db_usuarios')) || [
+            { email: "usuario1@cinefans.com", pass: "password123" }
+        ];
+
+        let usuarioActivo = null;
+        let esRegistro = false;
+
+        window.onload = function() {
+            cargarCarruseles();
+            pintarEstrenos();
+            renderizarTablaUsuarios();
+            renderizarCarruselesAdmin();
+            renderizarEstrenosAdmin();
+        };
+
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('activo');
+        }
+
+        function cerrarMenuMovil() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.remove('activo');
+        }
+
+        function moverCarrusel(idFila, desplazamiento) {
+            const fila = document.getElementById(idFila);
+            if (fila) {
+                fila.scrollBy({ left: desplazamiento, behavior: 'smooth' });
+            }
+        }
+
+        function verificarAccesoAdmin() {
+            if (esAdminAutenticado) {
+                mostrarVista('admin');
+                return;
+            }
+            const passwordIngresada = prompt("⚠️ ACCESO RESTRINGIDO\nIntroduce la contraseña de Administrador:");
+            if (passwordIngresada === CLAVE_ADMIN_SECRETA) {
+                esAdminAutenticado = true;
+                alert("¡Acceso concedido al Panel de Administración!");
+                mostrarVista('admin');
+            } else if (passwordIngresada !== null) {
+                alert("❌ Contraseña incorrecta.");
+            }
+        }
+
+        function mostrarVista(nombreVista) {
+            document.getElementById('vistaInicio').classList.remove('activa');
+            document.getElementById('vistaAuth').classList.remove('activa');
+            document.getElementById('vistaEstrenos').classList.remove('activa');
+            document.getElementById('vistaAdmin').classList.remove('activa');
+
+            const enlaces = document.querySelectorAll('.nav-link');
+            enlaces[0].classList.remove('active');
+            enlaces[1].classList.remove('active');
+
+            if (nombreVista === 'inicio') {
+                document.getElementById('vistaInicio').classList.add('activa');
+                enlaces[0].classList.add('active');
+            } else if (nombreVista === 'auth') {
+                document.getElementById('vistaAuth').classList.add('activa');
+            } else if (nombreVista === 'estrenos') {
+                document.getElementById('vistaEstrenos').classList.add('activa');
+                enlaces[1].classList.add('active');
+            } else if (nombreVista === 'admin') {
+                document.getElementById('vistaAdmin').classList.add('activa');
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function accederEstrenos() {
+            if (usuarioActivo) {
+                mostrarVista('estrenos');
+            } else {
+                modoFormulario('login');
+                mostrarVista('auth');
+            }
+        }
+
+        function cargarCarruseles() {
+            llenarFila('filaSeries', carruselesData.series);
+            llenarFila('filaEstrenosHome', carruselesData.estrenosHome);
+            llenarFila('filaClasicas', carruselesData.clasicas);
+        }
+
+        function llenarFila(idElemento, lista) {
+            const contenedor = document.getElementById(idElemento);
+            contenedor.innerHTML = '';
+            lista.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'tarjeta-carrusel';
+                div.setAttribute('tabindex', '0');
+                div.innerHTML = `
+                    <div class="contenedor-imagen-hover">
+                        <img src="${item.imgPrincipal}" class="img-principal" onerror="this.src='https://via.placeholder.com/220x310?text=Poster'">
+                        <img src="${item.imgHover || item.imgPrincipal}" class="img-hover" onerror="this.src='https://via.placeholder.com/220x310?text=Preview'">
+                    </div>
+                    <div class="tarjeta-carrusel-titulo">${item.titulo}</div>
+                `;
+                contenedor.appendChild(div);
+            });
+        }
+
+        function cambiarTabAdmin(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        function guardarItemCarrusel(e) {
+            e.preventDefault();
+            const editId = document.getElementById('carruselEditId').value;
+            const tipo = document.getElementById('carruselTipo').value;
+            const titulo = document.getElementById('carruselTitulo').value;
+            const imgPrincipal = document.getElementById('carruselImgPrincipal').value;
+            const imgHover = document.getElementById('carruselImgHover').value;
+
+            if (editId) {
+                let item = carruselesData[tipo].find(i => i.id == editId);
+                if (item) {
+                    item.titulo = titulo;
+                    item.imgPrincipal = imgPrincipal;
+                    item.imgHover = imgHover;
+                }
+                document.getElementById('carruselEditId').value = '';
+            } else {
+                const nuevoItem = { id: Date.now(), titulo, imgPrincipal, imgHover };
+                carruselesData[tipo].push(nuevoItem);
+            }
+
+            localStorage.setItem('carruseles_db', JSON.stringify(carruselesData));
+            alert('¡Guardado exitosamente!');
+            e.target.reset();
+            cargarCarruseles();
+            renderizarCarruselesAdmin();
+        }
+
+        function renderizarCarruselesAdmin() {
+            const cont = document.getElementById('listaCarruselesAdmin');
+            cont.innerHTML = '';
+            ['series', 'estrenosHome', 'clasicas'].forEach(cat => {
+                carruselesData[cat].forEach(item => {
+                    const row = document.createElement('div');
+                    row.className = 'item-row-admin';
+                    row.innerHTML = `
+                        <div class="item-info-admin">
+                            <img src="${item.imgPrincipal}">
+                            <div>
+                                <strong>${item.titulo}</strong>
+                                <div style="font-size:0.75rem; color:#888;">Categoría: ${cat}</div>
+                            </div>
+                        </div>
+                        <div>
+                            <button class="btn-tarjeta" style="background:#555; color:#fff;" onclick="cargarEdicionCarrusel('${cat}', ${item.id})">Editar</button>
+                            <button class="btn-tarjeta btn-borrar-estreno" onclick="borrarItemCarrusel('${cat}', ${item.id})">Borrar</button>
+                        </div>
+                    `;
+                    cont.appendChild(row);
+                });
+            });
+        }
+
+        function cargarEdicionCarrusel(cat, id) {
+            const item = carruselesData[cat].find(i => i.id === id);
+            if (item) {
+                document.getElementById('carruselEditId').value = item.id;
+                document.getElementById('carruselTipo').value = cat;
+                document.getElementById('carruselTitulo').value = item.titulo;
+                document.getElementById('carruselImgPrincipal').value = item.imgPrincipal;
+                document.getElementById('carruselImgHover').value = item.imgHover;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function borrarItemCarrusel(cat, id) {
+            if (confirm('¿Eliminar este elemento?')) {
+                carruselesData[cat] = carruselesData[cat].filter(i => i.id !== id);
+                localStorage.setItem('carruseles_db', JSON.stringify(carruselesData));
+                cargarCarruseles();
+                renderizarCarruselesAdmin();
+            }
+        }
+
+        function renderizarEstrenosAdmin() {
+            const cont = document.getElementById('listaEstrenosAdmin');
+            cont.innerHTML = '';
+            peliculasEstreno.forEach(p => {
+                const row = document.createElement('div');
+                row.className = 'item-row-admin';
+                row.innerHTML = `
+                    <div class="item-info-admin">
+                        <img src="${p.imagen}">
+                        <div>
+                            <strong>${p.titulo}</strong>
+                            <div style="font-size:0.75rem; color:#888;">${p.meta}</div>
                         </div>
                     </div>
-                    <div class="movie-info">
-                        <div class="movie-title" title="${pelicula.titulo}">${pelicula.titulo}</div>
-                        <div class="movie-year">${pelicula.anio}</div>
-                        <div class="movie-desc">${pelicula.descripcion}</div>
-                    </div>
-                    <div class="movie-actions">
-                        <button class="btn-action btn-watch" onclick="reproducirPelicula('${pelicula.videoUrl}', '${pelicula.titulo.replace(/'/g, "\\'")}')">▶ Ver</button>
-                        <button class="btn-action btn-edit" onclick="editarPelicula(${pelicula.id})">Editar</button>
-                        <button class="btn-action btn-delete" onclick="borrarPelicula(${pelicula.id})">Borrar</button>
+                    <div>
+                        <button class="btn-tarjeta" style="background:#555; color:#fff;" onclick="editarEstreno(${p.id})">Editar</button>
+                        <button class="btn-tarjeta btn-borrar-estreno" onclick="borrarEstreno(${p.id})">Borrar</button>
                     </div>
                 `;
-                movieGrid.appendChild(card);
+                cont.appendChild(row);
             });
-            localStorage.setItem('peliculas', JSON.stringify(peliculas));
         }
 
-        function abrirModal() {
-            document.getElementById('movieId').value = '';
-            movieForm.reset();
-            modalTitle.textContent = 'Subir Nueva Película';
-            movieModal.style.display = 'flex';
+        function renderizarTablaUsuarios() {
+            const tbody = document.getElementById('tablaUsuariosBody');
+            tbody.innerHTML = '';
+            dbUsuarios.forEach((u, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${u.email}</td>
+                    <td><code>${u.pass}</code></td>
+                    <td><button class="btn-tarjeta btn-borrar-estreno" onclick="borrarUsuario('${u.email}')">Eliminar</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            localStorage.setItem('db_usuarios', JSON.stringify(dbUsuarios));
         }
 
-        function cerrarModal() {
-            movieModal.style.display = 'none';
+        function borrarUsuario(email) {
+            if (confirm(`¿Eliminar usuario ${email}?`)) {
+                dbUsuarios = dbUsuarios.filter(u => u.email !== email);
+                renderizarTablaUsuarios();
+            }
         }
 
-        function reproducirPelicula(url, titulo) {
-            videoTitle.textContent = titulo;
-            videoPlayer.src = url;
-            videoModal.style.display = 'flex';
-            videoPlayer.play();
+        function modoFormulario(tipo) {
+            esRegistro = (tipo === 'registro');
+            document.getElementById('tituloAuth').textContent = esRegistro ? 'Registrarse' : 'Iniciar Sesión';
+            document.getElementById('btnAuthSubmit').textContent = esRegistro ? 'Registrarse' : 'Entrar';
+            document.getElementById('textoAuthSwitch').innerHTML = esRegistro 
+                ? '¿Ya tienes cuenta? <span onclick="modoFormulario(\'login\')" style="color:#fff; cursor:pointer; text-decoration:underline;">Inicia sesión</span>'
+                : '¿No tienes cuenta? <span onclick="modoFormulario(\'registro\')" style="color:#fff; cursor:pointer; text-decoration:underline;">Regístrate aquí</span>';
+        }
+
+        function procesarAuth(e) {
+            e.preventDefault();
+            const email = document.getElementById('authEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('authPass').value.trim();
+
+            if (esRegistro) {
+                if (dbUsuarios.find(u => u.email.toLowerCase() === email)) {
+                    alert('⚠️ El correo ya está registrado.');
+                    return;
+                }
+                dbUsuarios.push({ email, pass });
+                renderizarTablaUsuarios();
+                alert('¡Registro exitoso!');
+                modoFormulario('login');
+            } else {
+                const valido = dbUsuarios.find(u => u.email.toLowerCase() === email && u.pass === pass);
+                if (valido) {
+                    usuarioActivo = email;
+                    document.getElementById('btnSesion').textContent = 'Cerrar Sesión';
+                    document.getElementById('btnSesion').style.background = '#333';
+                    mostrarVista('estrenos');
+                } else {
+                    alert('Correo o contraseña incorrectos.');
+                }
+            }
+        }
+
+        function accionBotonSesion() {
+            if (usuarioActivo) {
+                usuarioActivo = null;
+                document.getElementById('btnSesion').textContent = 'Iniciar Sesión';
+                document.getElementById('btnSesion').style.background = '#E50914';
+                mostrarVista('inicio');
+            } else {
+                modoFormulario('login');
+                mostrarVista('auth');
+            }
+        }
+
+        function pintarEstrenos() {
+            const grid = document.getElementById('gridEstrenos');
+            grid.innerHTML = '';
+            peliculasEstreno.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'tarjeta-estreno';
+                div.innerHTML = `
+                    <img src="${p.imagen}">
+                    <div class="tarjeta-estreno-info">
+                        <div class="tarjeta-estreno-titulo">${p.titulo}</div>
+                        <div class="tarjeta-estreno-meta">${p.meta}</div>
+                        <div class="tarjeta-estreno-desc">${p.desc}</div>
+                    </div>
+                    <div class="tarjeta-estreno-botones">
+                        <button class="btn-tarjeta btn-ver-estreno" onclick="reproducir('${p.video}', '${p.titulo}')">▶ Ver</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            localStorage.setItem('estrenos_db', JSON.stringify(peliculasEstreno));
+        }
+
+        function abrirModalSubir() {
+            document.getElementById('editEstrenoId').value = '';
+            document.getElementById('modalSubirTitulo').textContent = 'Subir Nueva Película';
+            document.getElementById('modalSubir').style.display = 'flex';
+        }
+
+        function cerrarModalSubir() {
+            document.getElementById('modalSubir').style.display = 'none';
+        }
+
+        function guardarPelicula(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editEstrenoId').value;
+            let url = document.getElementById('inputVideo').value;
+
+            if (url.includes('drive.google.com')) {
+                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) url = `https://drive.google.com/file/d/${match[1]}/preview`;
+            }
+
+            if (editId) {
+                let p = peliculasEstreno.find(item => item.id == editId);
+                if (p) {
+                    p.titulo = document.getElementById('inputTitulo').value;
+                    p.meta = document.getElementById('inputMeta').value;
+                    p.imagen = document.getElementById('inputImagen').value;
+                    p.video = url;
+                    p.desc = document.getElementById('inputDesc').value;
+                }
+            } else {
+                peliculasEstreno.push({
+                    id: Date.now(),
+                    titulo: document.getElementById('inputTitulo').value,
+                    meta: document.getElementById('inputMeta').value,
+                    imagen: document.getElementById('inputImagen').value,
+                    video: url,
+                    desc: document.getElementById('inputDesc').value
+                });
+            }
+
+            cerrarModalSubir();
+            pintarEstrenos();
+            renderizarEstrenosAdmin();
+        }
+
+        function editarEstreno(id) {
+            const p = peliculasEstreno.find(item => item.id === id);
+            if (p) {
+                document.getElementById('editEstrenoId').value = p.id;
+                document.getElementById('inputTitulo').value = p.titulo;
+                document.getElementById('inputMeta').value = p.meta;
+                document.getElementById('inputImagen').value = p.imagen;
+                document.getElementById('inputVideo').value = p.video;
+                document.getElementById('inputDesc').value = p.desc;
+                document.getElementById('modalSubirTitulo').textContent = 'Editar Estreno';
+                document.getElementById('modalSubir').style.display = 'flex';
+            }
+        }
+
+        function borrarEstreno(id) {
+            if (confirm('¿Eliminar película?')) {
+                peliculasEstreno = peliculasEstreno.filter(p => p.id !== id);
+                pintarEstrenos();
+                renderizarEstrenosAdmin();
+            }
+        }
+
+        function reproducir(url, titulo) {
+            document.getElementById('tituloReproductor').textContent = titulo;
+            const caja = document.getElementById('contenedorReproductor');
+            if (url.includes('drive.google.com') || url.includes('preview')) {
+                caja.innerHTML = `<iframe src="${url}" allow="autoplay" allowfullscreen></iframe>`;
+            } else {
+                caja.innerHTML = `<video src="${url}" controls autoplay></video>`;
+            }
+            document.getElementById('modalReproductor').style.display = 'flex';
         }
 
         function cerrarReproductor() {
-            videoPlayer.pause();
-            videoPlayer.src = '';
-            videoModal.style.display = 'none';
+            document.getElementById('contenedorReproductor').innerHTML = '';
+            document.getElementById('modalReproductor').style.display = 'none';
         }
-
-        function guardarPelicula(event) {
-            event.preventDefault();
-            const id = document.getElementById('movieId').value;
-            const titulo = document.getElementById('titulo').value;
-            const anio = document.getElementById('anio').value;
-            const imagen = document.getElementById('imagen').value;
-            const videoUrl = document.getElementById('videoUrl').value;
-            const descripcion = document.getElementById('descripcion').value;
-
-            if (id) {
-                peliculas = peliculas.map(p => p.id == id ? { id: Number(id), titulo, anio, imagen, videoUrl, descripcion } : p);
-            } else {
-                const nuevaPelicula = {
-                    id: Date.now(),
-                    titulo,
-                    anio,
-                    imagen,
-                    videoUrl,
-                    descripcion
-                };
-                peliculas.push(nuevaPelicula);
-            }
-
-            cerrarModal();
-            renderizarPeliculas();
-        }
-
-        function editarPelicula(id) {
-            const pelicula = peliculas.find(p => p.id === id);
-            if (pelicula) {
-                document.getElementById('movieId').value = pelicula.id;
-                document.getElementById('titulo').value = pelicula.titulo;
-                document.getElementById('anio').value = pelicula.anio;
-                document.getElementById('imagen').value = pelicula.imagen;
-                document.getElementById('videoUrl').value = pelicula.videoUrl || '';
-                document.getElementById('descripcion').value = pelicula.descripcion;
-                
-                modalTitle.textContent = 'Editar Película';
-                movieModal.style.display = 'flex';
-            }
-        }
-
-        function borrarPelicula(id) {
-            if (confirm('¿Estás seguro de que deseas eliminar esta película?')) {
-                peliculas = peliculas.filter(p => p.id !== id);
-                renderizarPeliculas();
-            }
-        }
-
-        renderizarPeliculas();
     </script>
 </body>
 </html>
