@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raptor Games - Publicidad y Servicios</title>
+    <title>Raptor Games - Publicidad y Servicios (Smart TV)</title>
+    <!-- Librería de Navegación Espacial para Smart TV / D-Pad -->
+    <script src="https://luke-chang.github.io/js-spatial-navigation/spatial_navigation.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -19,7 +21,16 @@
             overflow-x: hidden;
         }
 
-        /* Barra de Navegación Adaptable con Menú Hamburguesa */
+        /* ESTILOS DE FOCO NATIVOS PARA TV */
+        :focus {
+            outline: 4px solid #00d2ff !important;
+            outline-offset: 2px;
+            transform: scale(1.05);
+            z-index: 99;
+            transition: transform 0.2s ease, outline 0.2s ease;
+        }
+
+        /* Barra de Navegación */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -59,17 +70,13 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            text-shadow: 0 2px 6px rgba(0,0,0,0.8);
         }
 
         .nav-subtitle {
             color: #b3b3b3;
             font-size: clamp(0.65rem, 1vw, 0.8rem);
-            font-weight: normal;
-            letter-spacing: 0.3px;
         }
 
-        /* Enlaces de Navegación por Defecto (Desktop / TV) */
         .nav-links {
             display: flex;
             gap: 15px;
@@ -77,7 +84,7 @@
         }
 
         .nav-link, .btn-auth-nav, .btn-admin-nav {
-            font-size: clamp(0.9rem, 1.2vw, 1.1rem);
+            font-size: clamp(0.85rem, 1.1vw, 1.05rem);
         }
 
         .nav-link {
@@ -85,13 +92,13 @@
             font-weight: bold;
             cursor: pointer;
             text-decoration: none;
-            transition: color 0.2s;
-            padding: 5px;
+            padding: 6px 10px;
+            border-radius: 4px;
         }
 
-        .nav-link:hover, .nav-link.active, .nav-link:focus {
+        .nav-link:focus, .nav-link.active {
             color: #fff;
-            outline: 2px solid #E50914;
+            background-color: rgba(229, 9, 20, 0.3);
         }
 
         .btn-auth-nav, .btn-admin-nav {
@@ -99,32 +106,12 @@
             border-radius: 4px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-auth-nav {
-            background-color: #E50914;
-            color: white;
             border: none;
         }
 
-        .btn-auth-nav:hover, .btn-auth-nav:focus {
-            background-color: #f40612;
-            outline: 3px solid #fff;
-        }
+        .btn-auth-nav { background-color: #E50914; color: white; }
+        .btn-admin-nav { background-color: #2b2b2b; color: #ffcc00; border: 1px solid #ffcc00; }
 
-        .btn-admin-nav {
-            background-color: #2b2b2b;
-            color: #ffcc00;
-            border: 1px solid #ffcc00;
-        }
-
-        .btn-admin-nav:hover, .btn-admin-nav:focus {
-            background-color: #3d3d3d;
-            outline: 3px solid #ffcc00;
-        }
-
-        /* Botón de Menú Hamburguesa (Oculto en Escritorio) */
         .menu-toggle {
             display: none;
             background: none;
@@ -135,12 +122,8 @@
             padding: 5px;
         }
 
-        /* Estilos Responsive para Celulares */
-        @media (max-width: 768px) {
-            .menu-toggle {
-                display: block;
-            }
-
+        @media (max-width: 992px) {
+            .menu-toggle { display: block; }
             .nav-links {
                 display: none;
                 flex-direction: column;
@@ -151,57 +134,24 @@
                 background: rgba(13, 13, 13, 0.98);
                 padding: 20px;
                 border-bottom: 3px solid #E50914;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.8);
                 gap: 15px;
                 align-items: stretch;
                 text-align: center;
             }
-
-            .nav-links.activo {
-                display: flex;
-            }
-
-            .btn-admin-nav, .btn-auth-nav {
-                width: 100%;
-                padding: 12px;
-            }
+            .nav-links.activo { display: flex; }
+            .btn-admin-nav, .btn-auth-nav { width: 100%; padding: 12px; }
         }
 
-        /* Contenedores de Vista */
-        .seccion-vista {
-            display: none;
-            padding: 25px 3%;
-        }
+        .seccion-vista { display: none; padding: 25px 3%; }
+        .seccion-vista.activa { display: block; }
+        .main-container { max-width: 1400px; margin: 0 auto; width: 100%; }
 
-        .seccion-vista.activa {
-            display: block;
-        }
-
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
-        }
-
-        /* DISTRIBUCIÓN DE CARRUSELES RESPONSIVE */
+        /* CARRUSELES EN FILA HORIZONTAL DE 6 IMÁGENES (Ajuste Perfecto) */
         .carruseles-layout-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            display: flex;
+            flex-direction: column;
             gap: 30px;
             width: 100%;
-        }
-
-        .carrusel-bloque-full {
-            grid-column: span 2;
-        }
-
-        @media (max-width: 1024px) {
-            .carruseles-layout-container {
-                grid-template-columns: 1fr;
-            }
-            .carrusel-bloque-full {
-                grid-column: span 1;
-            }
         }
 
         .carrusel-bloque {
@@ -209,6 +159,8 @@
             padding: 20px;
             border-radius: 8px;
             border: 1px solid #2a2a2a;
+            width: 100%;
+            overflow: hidden;
         }
 
         .carrusel-titulo {
@@ -219,12 +171,12 @@
             border-bottom: 2px solid #E50914;
             padding-bottom: 8px;
         }
-
-        /* Flechas Flotantes en Carruseles */
+        
         .carrusel-wrapper {
             position: relative;
             display: flex;
             align-items: center;
+            width: 100%;
         }
 
         .carousel-btn {
@@ -239,300 +191,105 @@
             cursor: pointer;
             z-index: 20;
             border-radius: 6px;
-            transition: background 0.2s, border-color 0.2s;
         }
 
-        .carousel-btn:hover, .carousel-btn:focus {
-            background-color: #E50914;
-            border-color: #fff;
-            outline: none;
-        }
+        .btn-left { left: -10px; }
+        .btn-right { right: -10px; }
 
-        .btn-left { left: -15px; }
-        .btn-right { right: -15px; }
-
-        @media (max-width: 768px) {
-            .carousel-btn { display: none; }
+        @media (max-width: 768px) { .carousel-btn { display: none; } }
+        
+        .carrusel-fila { 
+            display: flex; 
+            gap: 15px; 
+            overflow-x: auto; 
+            padding: 10px 5px; 
+            scroll-behavior: smooth; 
+            width: 100%; 
+            scrollbar-width: none; 
         }
+        
+        .carrusel-fila::-webkit-scrollbar { display: none; }
 
-        .carrusel-fila {
-            display: flex;
-            gap: 15px;
-            overflow-x: auto;
-            padding: 10px 5px;
-            scroll-behavior: smooth;
-            width: 100%;
-            scrollbar-width: thin;
-            scrollbar-color: #E50914 #222;
-        }
-
-        .carrusel-fila::-webkit-scrollbar {
-            height: 8px;
-        }
-        .carrusel-fila::-webkit-scrollbar-thumb {
-            background: #E50914;
-            border-radius: 4px;
-        }
-
-        /* Tarjetas Adaptables */
+        /* Cálculo exacto para mostrar 6 tarjetas por fila con gap de 15px */
         .tarjeta-carrusel {
-            min-width: 180px;
-            max-width: 220px;
-            flex: 0 0 auto;
+            flex: 0 0 calc((100% - 75px) / 6);
+            min-width: 140px;
             background: #222;
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
             position: relative;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
             box-shadow: 0 4px 12px rgba(0,0,0,0.5);
         }
 
-        .tarjeta-carrusel:hover, .tarjeta-carrusel:focus {
-            transform: scale(1.08);
-            z-index: 10;
-            outline: 3px solid #E50914;
+        /* Adaptabilidad para pantallas más pequeñas */
+        @media (max-width: 1200px) {
+            .tarjeta-carrusel { flex: 0 0 calc((100% - 60px) / 5); }
+        }
+        @media (max-width: 992px) {
+            .tarjeta-carrusel { flex: 0 0 calc((100% - 45px) / 4); }
+        }
+        @media (max-width: 768px) {
+            .tarjeta-carrusel { flex: 0 0 calc((100% - 30px) / 3); }
+        }
+        @media (max-width: 480px) {
+            .tarjeta-carrusel { flex: 0 0 calc((100% - 15px) / 2); }
         }
 
-        .contenedor-imagen-hover {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 2/3;
-            overflow: hidden;
-            background: #000;
-        }
-
-        .contenedor-imagen-hover img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transition: opacity 0.4s ease;
-        }
-
+        .contenedor-imagen-hover { position: relative; width: 100%; aspect-ratio: 2/3; overflow: hidden; background: #000; }
+        .contenedor-imagen-hover img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; transition: opacity 0.4s ease; }
         .img-principal { opacity: 1; z-index: 1; }
         .img-hover { opacity: 0; z-index: 2; }
+        .tarjeta-carrusel:focus .img-hover, .tarjeta-carrusel:hover .img-hover { opacity: 1; }
+        .tarjeta-carrusel-titulo { padding: 10px; font-size: 0.85rem; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: center; }
 
-        .tarjeta-carrusel:hover .img-hover,
-        .tarjeta-carrusel:focus .img-hover {
-            opacity: 1;
-        }
-
-        .tarjeta-carrusel-titulo {
-            padding: 10px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: center;
-        }
-
-        /* Formularios Auth y Modales Adaptables */
-        .caja-auth {
-            max-width: 420px;
-            width: 100%;
-            margin: 40px auto;
-            background: #181818;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.7);
-        }
-
+        /* Autenticación */
+        .caja-auth { max-width: 420px; width: 100%; margin: 40px auto; background: #181818; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.7); }
         .grupo-campo { margin-bottom: 15px; }
         .grupo-campo label { display: block; margin-bottom: 5px; color: #b3b3b3; font-size: 0.9rem; }
-        .grupo-campo input, .grupo-campo select, .grupo-campo textarea { 
-            width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; border-radius: 4px; font-size: 1rem;
-        }
-        .grupo-campo input:focus, .grupo-campo select:focus, .grupo-campo textarea:focus {
-            border-color: #E50914;
-            outline: none;
-        }
+        .grupo-campo input, .grupo-campo select, .grupo-campo textarea { width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; border-radius: 4px; font-size: 1rem; }
+        .btn-rojo { width: 100%; background-color: #E50914; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 4px; cursor: pointer; font-size: 1rem; }
 
-        .btn-rojo {
-            width: 100%;
-            background-color: #E50914;
-            color: white;
-            border: none;
-            padding: 12px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 1rem;
-        }
-        .btn-rojo:hover, .btn-rojo:focus { background-color: #f40612; outline: 2px solid #fff; }
-
-        /* Catálogo de Estrenos Grid */
-        .grid-estrenos {
+        /* Grids de Catálogo */
+        .grid-catalogo {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             gap: 20px;
         }
-
-        @media (min-width: 768px) {
-            .grid-estrenos {
-                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            }
-        }
-
-        .tarjeta-estreno {
-            background-color: #1f1f1f;
-            border-radius: 6px;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
-        }
-
-        .tarjeta-estreno img {
-            width: 100%;
-            aspect-ratio: 2/3;
-            object-fit: cover;
-            background: #000;
-        }
-
-        .tarjeta-estreno-info { padding: 12px; }
-        .tarjeta-estreno-titulo { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
-        .tarjeta-estreno-meta { font-size: 0.8rem; color: #46d369; font-weight: bold; margin-bottom: 6px; }
-        .tarjeta-estreno-desc { font-size: 0.8rem; color: #b3b3b3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
-        .tarjeta-estreno-botones { display: flex; gap: 5px; padding: 0 12px 12px 12px; }
-        
+        @media (min-width: 768px) { .grid-catalogo { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
+        .tarjeta-catalogo { background-color: #1f1f1f; border-radius: 6px; overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 4px 10px rgba(0,0,0,0.4); }
+        .tarjeta-catalogo img { width: 100%; aspect-ratio: 2/3; object-fit: cover; background: #000; }
+        .tarjeta-catalogo-info { padding: 12px; }
+        .tarjeta-catalogo-titulo { font-weight: bold; font-size: 1rem; margin-bottom: 4px; }
+        .tarjeta-catalogo-meta { font-size: 0.8rem; color: #46d369; font-weight: bold; margin-bottom: 6px; }
+        .tarjeta-catalogo-desc { font-size: 0.8rem; color: #b3b3b3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 10px; }
+        .tarjeta-catalogo-botones { display: flex; gap: 5px; padding: 0 12px 12px 12px; }
         .btn-tarjeta { flex: 1; padding: 10px; border: none; border-radius: 4px; font-size: 0.85rem; font-weight: bold; cursor: pointer; }
-        .btn-ver-estreno { background-color: #E50914; color: white; }
-        .btn-borrar-estreno { background-color: #333; color: #ff4d4d; }
+        .btn-ver-catalogo { background-color: #E50914; color: white; }
 
-        /* Panel Admin Tabs y Tablas */
-        .admin-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .tab-btn {
-            background: #222;
-            color: #b3b3b3;
-            border: 1px solid #444;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-
-        .tab-btn.active, .tab-btn:focus {
-            background: #E50914;
-            color: white;
-            border-color: #E50914;
-            outline: none;
-        }
-
-        .tab-content {
-            display: none;
-            background: #181818;
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-        }
-
+        /* Panel Admin */
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { background: #222; color: #b3b3b3; border: 1px solid #444; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .tab-btn.active { background: #E50914; color: white; border-color: #E50914; }
+        .tab-content { display: none; background: #181818; padding: 20px; border-radius: 8px; overflow-x: auto; }
         .tab-content.active { display: block; }
 
-        .tabla-admin {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-            min-width: 500px;
-        }
-
-        .tabla-admin th, .tabla-admin td {
-            border: 1px solid #333;
-            padding: 12px;
-            text-align: left;
-            font-size: 0.9rem;
-        }
-
+        .tabla-admin { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
+        .tabla-admin th, .tabla-admin td { border: 1px solid #333; padding: 12px; text-align: left; font-size: 0.9rem; }
         .tabla-admin th { background: #222; color: #E50914; }
-        .tabla-admin tr:nth-child(even) { background: #1f1f1f; }
 
-        .lista-items-admin {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 20px;
-        }
+        .lista-items-admin { display: flex; flex-direction: column; gap: 10px; margin-top: 20px; }
+        .item-row-admin { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px 15px; border-radius: 4px; flex-wrap: wrap; gap: 10px; }
+        .item-info-admin { display: flex; align-items: center; gap: 15px; }
+        .item-info-admin img { width: 45px; height: 65px; object-fit: cover; border-radius: 3px; }
 
-        .item-row-admin {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #222;
-            padding: 10px 15px;
-            border-radius: 4px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .item-info-admin {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .item-info-admin img {
-            width: 45px;
-            height: 65px;
-            object-fit: cover;
-            border-radius: 3px;
-        }
-
-        /* Modales Adaptables */
-        .modal-fondo {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            justify-content: center; align-items: center;
-            z-index: 2000;
-            padding: 15px;
-        }
-
-        .modal-caja { 
-            background: #181818; 
-            padding: 25px; 
-            border-radius: 8px; 
-            width: 100%; 
-            max-width: 500px; 
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .reproductor-caja { 
-            background: #000; 
-            padding: 20px; 
-            border-radius: 8px; 
-            width: 100%; 
-            max-width: 950px; 
-            position: relative; 
-        }
-
-        .reproductor-contenedor { 
-            width: 100%; 
-            aspect-ratio: 16/9; 
-            background: #000; 
-        }
-
-        .reproductor-contenedor iframe, .reproductor-contenedor video { 
-            width: 100%; 
-            height: 100%; 
-            border: none; 
-        }
-        
-        .cerrar-modal {
-            position: absolute; top: 10px; right: 10px; background: #E50914; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; z-index: 10;
-        }
+        /* Modales */
+        .modal-fondo { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); justify-content: center; align-items: center; z-index: 2000; padding: 15px; }
+        .modal-caja { background: #181818; padding: 25px; border-radius: 8px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .reproductor-caja { background: #000; padding: 20px; border-radius: 8px; width: 100%; max-width: 950px; position: relative; }
+        .reproductor-contenedor { width: 100%; aspect-ratio: 16/9; background: #000; }
+        .reproductor-contenedor iframe, .reproductor-contenedor video { width: 100%; height: 100%; border: none; }
+        .cerrar-modal { position: absolute; top: 10px; right: 10px; background: #E50914; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 1.2rem; font-weight: bold; cursor: pointer; z-index: 10; }
     </style>
 </head>
 <body>
@@ -545,55 +302,63 @@
                 <div class="nav-brand">Publicidad y Servicios</div>
                 <div class="nav-subtitle">El mejor contenido de entretenimiento al mejor precio</div>
             </div>
-            <button class="btn-admin-nav" onclick="verificarAccesoAdmin()" tabindex="0" style="margin-left: 10px;">⚙️ Admin</button>
+            <button class="btn-admin-nav focusable" onclick="verificarAccesoAdmin()" tabindex="0" style="margin-left: 10px;">⚙️ Admin</button>
         </div>
 
-        <!-- Botón de Menú Hamburguesa para Celulares -->
-        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Abrir Menú">☰</button>
+        <button class="menu-toggle focusable" onclick="toggleMenu()" aria-label="Abrir Menú" tabindex="0">☰</button>
 
-        <!-- Enlaces de Navegación -->
         <div class="nav-links" id="navLinks">
-            <span class="nav-link active" onclick="mostrarVista('inicio'); cerrarMenuMovil();" tabindex="0">Inicio</span>
-            <span class="nav-link" onclick="accederEstrenos(); cerrarMenuMovil();" tabindex="0">Estrenos</span>
-            <button class="btn-auth-nav" id="btnSesion" onclick="accionBotonSesion(); cerrarMenuMovil();" tabindex="0">Iniciar Sesión</button>
+            <span class="nav-link active focusable" onclick="mostrarVista('inicio'); cerrarMenuMovil();" tabindex="0">Inicio</span>
+            <span class="nav-link focusable" onclick="accederSeccionProtegida('estrenos'); cerrarMenuMovil();" tabindex="0">Estrenos</span>
+            <span class="nav-link focusable" onclick="accederSeccionProtegida('series'); cerrarMenuMovil();" tabindex="0">Series</span>
+            <span class="nav-link focusable" onclick="accederSeccionProtegida('animes'); cerrarMenuMovil();" tabindex="0">Animes</span>
+            <button class="btn-auth-nav focusable" id="btnSesion" onclick="accionBotonSesion(); cerrarMenuMovil();" tabindex="0">Iniciar Sesión</button>
         </div>
     </div>
 
     <!-- VISTA 1: INICIO -->
     <div id="vistaInicio" class="seccion-vista activa">
         <div class="main-container">
+            <!-- ALERTA FLOTANTE DE MEMBRESÍA -->
+            <div id="alertaMembresia" style="display: none; background: linear-gradient(135deg, #E50914, #b20710); padding: 15px 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(229,9,20,0.4); justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 id="alertaTitulo" style="font-size: 1.1rem; margin-bottom: 4px;">⚠️ Aviso de Suscripción</h3>
+                    <p id="alertaTexto" style="font-size: 0.9rem; color: #f1f1f1;">Calculando días restantes...</p>
+                </div>
+                <button class="btn-tarjeta focusable" onclick="document.getElementById('alertaMembresia').style.display='none'" style="background: rgba(0,0,0,0.5); color: #fff; width: auto; padding: 8px 15px;" tabindex="0">Entendido</button>
+            </div>
+
+            <!-- BLOQUES DE CARRUSELES HORIZONTALES APILADOS -->
             <div class="carruseles-layout-container">
-                
-                <!-- Carrusel 1 -->
+                <!-- 1. SERIES NUEVAS -->
                 <div class="carrusel-bloque">
                     <div class="carrusel-titulo">📺 Series Nuevas</div>
-                    <div class="carrusel-wrapper">
-                        <button class="carousel-btn btn-left" onclick="moverCarrusel('filaSeries', -300)">&#10094;</button>
+                    <div class="carrusel-wrapper" onmouseenter="pausarCarruselAuto('filaSeries')" onmouseleave="reanudarCarruselAuto('filaSeries')">
+                        <button class="carousel-btn btn-left focusable" onclick="moverCarrusel('filaSeries', -1)" tabindex="0">&#10094;</button>
                         <div class="carrusel-fila" id="filaSeries"></div>
-                        <button class="carousel-btn btn-right" onclick="moverCarrusel('filaSeries', 300)">&#10095;</button>
+                        <button class="carousel-btn btn-right focusable" onclick="moverCarrusel('filaSeries', 1)" tabindex="0">&#10095;</button>
                     </div>
                 </div>
 
-                <!-- Carrusel 2 -->
+                <!-- 2. PELÍCULAS DE ESTRENO -->
                 <div class="carrusel-bloque">
                     <div class="carrusel-titulo">🎬 Películas de Estreno</div>
-                    <div class="carrusel-wrapper">
-                        <button class="carousel-btn btn-left" onclick="moverCarrusel('filaEstrenosHome', -300)">&#10094;</button>
+                    <div class="carrusel-wrapper" onmouseenter="pausarCarruselAuto('filaEstrenosHome')" onmouseleave="reanudarCarruselAuto('filaEstrenosHome')">
+                        <button class="carousel-btn btn-left focusable" onclick="moverCarrusel('filaEstrenosHome', -1)" tabindex="0">&#10094;</button>
                         <div class="carrusel-fila" id="filaEstrenosHome"></div>
-                        <button class="carousel-btn btn-right" onclick="moverCarrusel('filaEstrenosHome', 300)">&#10095;</button>
+                        <button class="carousel-btn btn-right focusable" onclick="moverCarrusel('filaEstrenosHome', 1)" tabindex="0">&#10095;</button>
                     </div>
                 </div>
 
-                <!-- Carrusel 3 (Inferior) -->
-                <div class="carrusel-bloque carrusel-bloque-full">
+                <!-- 3. VIEJAS PERO BUENAS -->
+                <div class="carrusel-bloque">
                     <div class="carrusel-titulo">🍿 Viejas pero Buenas</div>
-                    <div class="carrusel-wrapper">
-                        <button class="carousel-btn btn-left" onclick="moverCarrusel('filaClasicas', -400)">&#10094;</button>
+                    <div class="carrusel-wrapper" onmouseenter="pausarCarruselAuto('filaClasicas')" onmouseleave="reanudarCarruselAuto('filaClasicas')">
+                        <button class="carousel-btn btn-left focusable" onclick="moverCarrusel('filaClasicas', -1)" tabindex="0">&#10094;</button>
                         <div class="carrusel-fila" id="filaClasicas"></div>
-                        <button class="carousel-btn btn-right" onclick="moverCarrusel('filaClasicas', 400)">&#10095;</button>
+                        <button class="carousel-btn btn-right focusable" onclick="moverCarrusel('filaClasicas', 1)" tabindex="0">&#10095;</button>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
@@ -606,86 +371,164 @@
                 <form onsubmit="procesarAuth(event)">
                     <div class="grupo-campo">
                         <label>Correo Electrónico</label>
-                        <input type="email" id="authEmail" required>
+                        <input type="email" id="authEmail" class="focusable" required tabindex="0">
                     </div>
                     <div class="grupo-campo">
                         <label>Contraseña</label>
-                        <input type="password" id="authPass" required>
+                        <input type="password" id="authPass" class="focusable" required tabindex="0">
                     </div>
-                    <button type="submit" class="btn-rojo" id="btnAuthSubmit">Entrar</button>
+                    <button type="submit" class="btn-rojo focusable" id="btnAuthSubmit" tabindex="0">Entrar</button>
                 </form>
                 <div class="texto-cambio-auth" id="textoAuthSwitch" style="margin-top: 15px; text-align: center; font-size: 0.9rem; color: #b3b3b3;">
-                    ¿No tienes cuenta? <span onclick="modoFormulario('registro')" style="color:#fff; cursor:pointer; text-decoration:underline;">Regístrate aquí</span>
+                    ¿No tienes cuenta? <span class="focusable" onclick="modoFormulario('registro')" style="color:#fff; cursor:pointer; text-decoration:underline;" tabindex="0">Regístrate aquí</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- VISTA 3: PELÍCULAS DE ESTRENO -->
+    <!-- VISTA 3: ESTRENOS -->
     <div id="vistaEstrenos" class="seccion-vista">
         <div class="main-container">
-            <div class="estrenos-encabezado" style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+            <div style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
                 <h1 style="color: #E50914; font-size: clamp(1.5rem, 2.5vw, 2.2rem);">Películas de Estreno</h1>
                 <p style="color: #b3b3b3; margin-top: 5px;">Catálogo exclusivo de lanzamientos recientes</p>
             </div>
-            <div class="grid-estrenos" id="gridEstrenos"></div>
+            <div class="grid-catalogo" id="gridEstrenos"></div>
         </div>
     </div>
 
-    <!-- VISTA 4: PANEL DE ADMINISTRACIÓN -->
+    <!-- VISTA 4: SERIES -->
+    <div id="vistaSeries" class="seccion-vista">
+        <div class="main-container">
+            <div style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+                <h1 style="color: #00d2ff; font-size: clamp(1.5rem, 2.5vw, 2.2rem);">Series de TV</h1>
+                <p style="color: #b3b3b3; margin-top: 5px;">Temporadas completas y episodios destacados</p>
+            </div>
+            <div class="grid-catalogo" id="gridSeries"></div>
+        </div>
+    </div>
+
+    <!-- VISTA 5: ANIMES -->
+    <div id="vistaAnimes" class="seccion-vista">
+        <div class="main-container">
+            <div style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+                <h1 style="color: #ff9900; font-size: clamp(1.5rem, 2.5vw, 2.2rem);">Animes</h1>
+                <p style="color: #b3b3b3; margin-top: 5px;">Los mejores títulos de animación japonesa en alta calidad</p>
+            </div>
+            <div class="grid-catalogo" id="gridAnimes"></div>
+        </div>
+    </div>
+
+    <!-- VISTA 6: PANEL DE ADMINISTRACIÓN -->
     <div id="vistaAdmin" class="seccion-vista">
         <div class="main-container">
-            <div class="admin-header" style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
+            <div style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 15px;">
                 <h1 style="color: #E50914; font-size: clamp(1.5rem, 2.5vw, 2.2rem);">Panel de Administración</h1>
-                <p style="color: #b3b3b3;">Gestiona carruseles, películas y usuarios registrados</p>
+                <p style="color: #b3b3b3;">Gestiona carruseles, contenidos y membresías de usuarios</p>
             </div>
 
             <div class="admin-tabs">
-                <button class="tab-btn active" onclick="cambiarTabAdmin('tabCarruseles')">🖼️ Carruseles</button>
-                <button class="tab-btn" onclick="cambiarTabAdmin('tabEstrenosAdmin')">🎬 Estrenos</button>
-                <button class="tab-btn" onclick="cambiarTabAdmin('tabUsuarios')">👥 Usuarios</button>
+                <button class="tab-btn active focusable" onclick="cambiarTabAdmin('tabCarruseles')" tabindex="0">🖼️ Carruseles</button>
+                <button class="tab-btn focusable" onclick="cambiarTabAdmin('tabEstrenosAdmin')" tabindex="0">🎬 Estrenos</button>
+                <button class="tab-btn focusable" onclick="cambiarTabAdmin('tabSeriesAdmin')" tabindex="0">📺 Series</button>
+                <button class="tab-btn focusable" onclick="cambiarTabAdmin('tabAnimesAdmin')" tabindex="0">🍙 Animes</button>
+                <button class="tab-btn focusable" onclick="cambiarTabAdmin('tabUsuarios')" tabindex="0">👥 Usuarios & Membresías</button>
             </div>
 
-            <!-- TAB 1: GESTIÓN DE CARRUSELES -->
+            <!-- TAB 1: CARRUSELES -->
             <div id="tabCarruseles" class="tab-content active">
-                <h3>Subir / Editar Elemento en Carrusel</h3>
+                <h3 id="tituloFormCarrusel">Añadir / Editar Elemento en Carrusel</h3>
                 <form onsubmit="guardarItemCarrusel(event)" style="margin-top: 15px; max-width: 500px;">
                     <input type="hidden" id="carruselEditId">
                     <div class="grupo-campo">
                         <label>Seleccionar Carrusel Destino</label>
-                        <select id="carruselTipo">
+                        <select id="carruselTipo" class="focusable" tabindex="0">
                             <option value="series">📺 Series Nuevas</option>
                             <option value="estrenosHome">🎬 Películas de Estreno</option>
                             <option value="clasicas">🍿 Viejas pero Buenas</option>
                         </select>
                     </div>
-                    <div class="grupo-campo"><label>Título</label><input type="text" id="carruselTitulo" required></div>
-                    <div class="grupo-campo"><label>URL Imagen Principal</label><input type="text" id="carruselImgPrincipal" required></div>
-                    <div class="grupo-campo"><label>URL Imagen Hover</label><input type="text" id="carruselImgHover" required></div>
-                    <button type="submit" class="btn-rojo" style="width: auto; padding: 10px 20px;">Guardar en Carrusel</button>
+                    <div class="grupo-campo"><label>Título</label><input type="text" id="carruselTitulo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>URL Imagen Principal</label><input type="text" id="carruselImgPrincipal" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>URL Imagen Hover</label><input type="text" id="carruselImgHover" class="focusable" required tabindex="0"></div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" class="btn-rojo focusable" style="width: auto; padding: 10px 20px;" tabindex="0">Guardar en Carrusel</button>
+                        <button type="button" class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="limpiarFormCarrusel()" tabindex="0">Cancelar Edición</button>
+                    </div>
                 </form>
 
-                <h3 style="margin-top: 30px;">Elementos en Carruseles</h3>
+                <h3 style="margin-top: 30px;">Elementos actuales en Carruseles</h3>
                 <div class="lista-items-admin" id="listaCarruselesAdmin"></div>
             </div>
 
-            <!-- TAB 2: GESTIÓN DE ESTRENOS -->
+            <!-- TAB 2: ESTRENOS -->
             <div id="tabEstrenosAdmin" class="tab-content">
-                <h3>Lista de Películas de Estreno</h3>
-                <button class="btn-rojo" style="width: auto; padding: 10px 20px; margin-top: 15px;" onclick="abrirModalSubir()">+ Nueva Película</button>
+                <h3 id="tituloFormEstreno">Añadir Nueva Película de Estreno</h3>
+                <form onsubmit="guardarContenido(event, 'estrenos')" style="margin-top: 15px; max-width: 500px;">
+                    <input type="hidden" id="editEstrenosId">
+                    <div class="grupo-campo"><label>Título</label><input type="text" id="inputEstrenosTitulo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Año / Categoría</label><input type="text" id="inputEstrenosMeta" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>URL Imagen Póster</label><input type="text" id="inputEstrenosImagen" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Enlace Drive o MP4</label><input type="text" id="inputEstrenosVideo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Descripción</label><textarea id="inputEstrenosDesc" class="focusable" required rows="3" tabindex="0"></textarea></div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" class="btn-rojo focusable" style="width: auto; padding: 10px 20px;" tabindex="0">Guardar Estreno</button>
+                        <button type="button" class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="limpiarFormulario('estrenos')" tabindex="0">Cancelar</button>
+                    </div>
+                </form>
+                <h3 style="margin-top: 30px;">Lista de Estrenos</h3>
                 <div class="lista-items-admin" id="listaEstrenosAdmin"></div>
             </div>
 
-            <!-- TAB 3: GESTIÓN DE USUARIOS -->
+            <!-- TAB 3: SERIES -->
+            <div id="tabSeriesAdmin" class="tab-content">
+                <h3 id="tituloFormSeries">Añadir Nueva Serie</h3>
+                <form onsubmit="guardarContenido(event, 'series')" style="margin-top: 15px; max-width: 500px;">
+                    <input type="hidden" id="editSeriesId">
+                    <div class="grupo-campo"><label>Título</label><input type="text" id="inputSeriesTitulo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Temporada / Categoría</label><input type="text" id="inputSeriesMeta" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>URL Imagen Póster</label><input type="text" id="inputSeriesImagen" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Enlace Drive o MP4</label><input type="text" id="inputSeriesVideo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Descripción</label><textarea id="inputSeriesDesc" class="focusable" required rows="3" tabindex="0"></textarea></div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" class="btn-rojo focusable" style="width: auto; padding: 10px 20px;" tabindex="0">Guardar Serie</button>
+                        <button type="button" class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="limpiarFormulario('series')" tabindex="0">Cancelar</button>
+                    </div>
+                </form>
+                <h3 style="margin-top: 30px;">Lista de Series</h3>
+                <div class="lista-items-admin" id="listaSeriesAdmin"></div>
+            </div>
+
+            <!-- TAB 4: ANIMES -->
+            <div id="tabAnimesAdmin" class="tab-content">
+                <h3 id="tituloFormAnimes">Añadir Nuevo Anime</h3>
+                <form onsubmit="guardarContenido(event, 'animes')" style="margin-top: 15px; max-width: 500px;">
+                    <input type="hidden" id="editAnimesId">
+                    <div class="grupo-campo"><label>Título</label><input type="text" id="inputAnimesTitulo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Emisión / Categoría</label><input type="text" id="inputAnimesMeta" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>URL Imagen Póster</label><input type="text" id="inputAnimesImagen" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Enlace Drive o MP4</label><input type="text" id="inputAnimesVideo" class="focusable" required tabindex="0"></div>
+                    <div class="grupo-campo"><label>Descripción</label><textarea id="inputAnimesDesc" class="focusable" required rows="3" tabindex="0"></textarea></div>
+                    <div style="display:flex; gap:10px;">
+                        <button type="submit" class="btn-rojo focusable" style="width: auto; padding: 10px 20px;" tabindex="0">Guardar Anime</button>
+                        <button type="button" class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="limpiarFormulario('animes')" tabindex="0">Cancelar</button>
+                    </div>
+                </form>
+                <h3 style="margin-top: 30px;">Lista de Animes</h3>
+                <div class="lista-items-admin" id="listaAnimesAdmin"></div>
+            </div>
+
+            <!-- TAB 5: USUARIOS Y MENSUALIDADES -->
             <div id="tabUsuarios" class="tab-content">
-                <h3>Lista de Usuarios Registrados y Contraseñas</h3>
+                <h3>Gestión de Usuarios y Plazo de Membresía (30 Días)</h3>
                 <table class="tabla-admin">
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>Correo Electrónico</th>
+                            <th>Correo</th>
                             <th>Contraseña</th>
-                            <th>Acción</th>
+                            <th>Estado Membresía</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaUsuariosBody"></tbody>
@@ -694,29 +537,10 @@
         </div>
     </div>
 
-    <!-- MODAL SUBIR / EDITAR -->
-    <div class="modal-fondo" id="modalSubir">
-        <div class="modal-caja">
-            <h2 style="margin-bottom: 15px;" id="modalSubirTitulo">Subir Nueva Película</h2>
-            <form onsubmit="guardarPelicula(event)">
-                <input type="hidden" id="editEstrenoId">
-                <div class="grupo-campo"><label>Título</label><input type="text" id="inputTitulo" required></div>
-                <div class="grupo-campo"><label>Año / Categoría</label><input type="text" id="inputMeta" required></div>
-                <div class="grupo-campo"><label>URL Imagen Póster</label><input type="text" id="inputImagen" required></div>
-                <div class="grupo-campo"><label>Enlace Drive o MP4</label><input type="text" id="inputVideo" required></div>
-                <div class="grupo-campo"><label>Descripción</label><textarea id="inputDesc" required rows="3"></textarea></div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
-                    <button type="button" class="btn-rojo" style="background:#444; width: auto;" onclick="cerrarModalSubir()">Cancelar</button>
-                    <button type="submit" class="btn-rojo" style="width: auto;">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- MODAL REPRODUCTOR -->
     <div class="modal-fondo" id="modalReproductor">
         <div class="reproductor-caja">
-            <button class="cerrar-modal" onclick="cerrarReproductor()">×</button>
+            <button class="cerrar-modal focusable" onclick="cerrarReproductor()" tabindex="0">×</button>
             <h3 id="tituloReproductor" style="margin-bottom: 10px; font-size: 1.2rem;">Reproduciendo</h3>
             <div class="reproductor-contenedor" id="contenedorReproductor"></div>
         </div>
@@ -725,44 +549,94 @@
     <script>
         const CLAVE_ADMIN_SECRETA = "admin2026";
         let esAdminAutenticado = false;
+        let intervalosCarrusel = {};
+        let carruselIndices = {
+            'filaSeries': 0,
+            'filaEstrenosHome': 0,
+            'filaClasicas': 0
+        };
 
         let carruselesData = JSON.parse(localStorage.getItem('carruseles_db')) || {
             series: [
-                { id: 101, titulo: "Cyber Edge", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
+                { id: 101, titulo: "Cyber Edge 1", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 102, titulo: "Cyber Edge 2", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 103, titulo: "Cyber Edge 3", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 104, titulo: "Cyber Edge 4", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 105, titulo: "Cyber Edge 5", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 106, titulo: "Cyber Edge 6", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 107, titulo: "Cyber Edge 7", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
             ],
             estrenosHome: [
-                { id: 102, titulo: "Animales", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
+                { id: 201, titulo: "Estreno 1", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 202, titulo: "Estreno 2", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 203, titulo: "Estreno 3", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 204, titulo: "Estreno 4", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 205, titulo: "Estreno 5", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 206, titulo: "Estreno 6", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" }
             ],
             clasicas: [
-                { id: 103, titulo: "Big Buck Bunny", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" }
+                { id: 301, titulo: "Clásica 1", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 302, titulo: "Clásica 2", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 303, titulo: "Clásica 3", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 304, titulo: "Clásica 4", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" },
+                { id: 305, titulo: "Clásica 5", imgPrincipal: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", imgHover: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg" },
+                { id: 306, titulo: "Clásica 6", imgPrincipal: "https://image.tmdb.org/t/p/w500/8YFL5QQA3Seb1L2m9O2893A4.jpg", imgHover: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg" }
             ]
         };
 
         let peliculasEstreno = JSON.parse(localStorage.getItem('estrenos_db')) || [
-            {
-                id: 1,
-                titulo: "Animales (Estreno)",
-                meta: "2026 • Suspense",
-                imagen: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg",
-                video: "https://www.w3schools.com/html/mov_bbb.mp4",
-                desc: "Película de estreno en formato MP4 o Google Drive."
-            }
+            { id: 1, titulo: "Animales (Estreno)", meta: "2026 • Suspense", imagen: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", video: "https://www.w3schools.com/html/mov_bbb.mp4", desc: "Película de estreno en formato MP4 o Google Drive." }
+        ];
+
+        let seriesCatalogo = JSON.parse(localStorage.getItem('series_db')) || [
+            { id: 201, titulo: "Cyber Edge (Serie)", meta: "Temporada 1 • Acciones", imagen: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", video: "https://www.w3schools.com/html/mov_bbb.mp4", desc: "Serie completa con alta definición para Smart TV." }
+        ];
+
+        let animesCatalogo = JSON.parse(localStorage.getItem('animes_db')) || [
+            { id: 301, titulo: "Anime Acción X", meta: "En emisión • Acción", imagen: "https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mA2B5ggV6.jpg", video: "https://www.w3schools.com/html/mov_bbb.mp4", desc: "Los mejores animes recopilados para disfrutar en pantalla grande." }
         ];
 
         let dbUsuarios = JSON.parse(localStorage.getItem('db_usuarios')) || [
-            { email: "usuario1@cinefans.com", pass: "password123" }
+            { email: "usuario1@cinefans.com", pass: "password123", registroTime: Date.now() }
         ];
 
         let usuarioActivo = null;
         let esRegistro = false;
 
-        window.onload = function() {
+        window.addEventListener('load', () => {
+            SpatialNavigation.init();
+            SpatialNavigation.add({ selector: '.focusable' });
+            SpatialNavigation.makeFocusable();
+            SpatialNavigation.focus();
+
+            verificarExpiracionSesionActual();
             cargarCarruseles();
-            pintarEstrenos();
+            pintarCatalogo('gridEstrenos', peliculasEstreno, 'estrenos_db');
+            pintarCatalogo('gridSeries', seriesCatalogo, 'series_db');
+            pintarCatalogo('gridAnimes', animesCatalogo, 'animes_db');
             renderizarTablaUsuarios();
             renderizarCarruselesAdmin();
-            renderizarEstrenosAdmin();
-        };
+            renderizarContenidoAdmin('estrenos');
+            renderizarContenidoAdmin('series');
+            renderizarContenidoAdmin('animes');
+
+            iniciarCarruselesAutomaticos();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' || e.key === 'Back' || e.keyCode === 10009 || e.keyCode === 8) {
+                if (document.getElementById('modalReproductor').style.display === 'flex') {
+                    cerrarReproductor();
+                    e.preventDefault();
+                } else {
+                    const navLinks = document.getElementById('navLinks');
+                    if (navLinks.classList.contains('activo')) {
+                        navLinks.classList.remove('activo');
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
 
         function toggleMenu() {
             const navLinks = document.getElementById('navLinks');
@@ -774,18 +648,105 @@
             navLinks.classList.remove('activo');
         }
 
-        function moverCarrusel(idFila, desplazamiento) {
+        // --- SISTEMA DE MOVIMIENTO ADAPTABLE POR TARJETAS ---
+        function moverCarrusel(idFila, direccion) {
             const fila = document.getElementById(idFila);
-            if (fila) {
-                fila.scrollBy({ left: desplazamiento, behavior: 'smooth' });
+            if (!fila) return;
+
+            const tarjetas = fila.querySelectorAll('.tarjeta-carrusel');
+            if (tarjetas.length === 0) return;
+
+            const tarjetaAncho = tarjetas[0].offsetWidth + 15;
+            const contenedorAncho = fila.clientWidth;
+            const tarjetasVisibles = Math.floor(contenedorAncho / tarjetaAncho) || 1;
+            const indiceMaximo = Math.max(0, tarjetas.length - tarjetasVisibles);
+
+            if (carruselIndices[idFila] === undefined) {
+                carruselIndices[idFila] = 0;
+            }
+
+            carruselIndices[idFila] += direccion * tarjetasVisibles;
+
+            if (carruselIndices[idFila] < 0) {
+                carruselIndices[idFila] = 0;
+            } else if (carruselIndices[idFila] > indiceMaximo) {
+                carruselIndices[idFila] = indiceMaximo;
+            }
+
+            fila.scrollTo({
+                left: carruselIndices[idFila] * tarjetaAncho,
+                behavior: 'smooth'
+            });
+        }
+
+        // --- CARRUSELES AUTOMÁTICOS ---
+        function iniciarCarruselesAutomaticos() {
+            const idsFilas = ['filaSeries', 'filaEstrenosHome', 'filaClasicas'];
+
+            idsFilas.forEach(idFila => {
+                const fila = document.getElementById(idFila);
+                if (!fila) return;
+
+                intervalosCarrusel[idFila] = setInterval(() => {
+                    const tarjetas = fila.querySelectorAll('.tarjeta-carrusel');
+                    if (tarjetas.length === 0) return;
+
+                    const tarjetaAncho = tarjetas[0].offsetWidth + 15;
+                    const contenedorAncho = fila.clientWidth;
+                    const tarjetasVisibles = Math.floor(contenedorAncho / tarjetaAncho) || 1;
+                    const indiceMaximo = Math.max(0, tarjetas.length - tarjetasVisibles);
+
+                    if (carruselIndices[idFila] === undefined) carruselIndices[idFila] = 0;
+
+                    carruselIndices[idFila]++;
+                    if (carruselIndices[idFila] > indiceMaximo) {
+                        carruselIndices[idFila] = 0;
+                    }
+
+                    fila.scrollTo({
+                        left: carruselIndices[idFila] * tarjetaAncho,
+                        behavior: 'smooth'
+                    });
+                }, 4000);
+            });
+        }
+
+        function pausarCarruselAuto(idFila) {
+            if (intervalosCarrusel[idFila]) {
+                clearInterval(intervalosCarrusel[idFila]);
             }
         }
 
+        function reanudarCarruselAuto(idFila) {
+            pausarCarruselAuto(idFila);
+            const fila = document.getElementById(idFila);
+            if (!fila) return;
+
+            intervalosCarrusel[idFila] = setInterval(() => {
+                const tarjetas = fila.querySelectorAll('.tarjeta-carrusel');
+                if (tarjetas.length === 0) return;
+
+                const tarjetaAncho = tarjetas[0].offsetWidth + 15;
+                const contenedorAncho = fila.clientWidth;
+                const tarjetasVisibles = Math.floor(contenedorAncho / tarjetaAncho) || 1;
+                const indiceMaximo = Math.max(0, tarjetas.length - tarjetasVisibles);
+
+                if (carruselIndices[idFila] === undefined) carruselIndices[idFila] = 0;
+
+                carruselIndices[idFila]++;
+                if (carruselIndices[idFila] > indiceMaximo) {
+                    carruselIndices[idFila] = 0;
+                }
+
+                fila.scrollTo({
+                    left: carruselIndices[idFila] * tarjetaAncho,
+                    behavior: 'smooth'
+                });
+            }, 4000);
+        }
+
         function verificarAccesoAdmin() {
-            if (esAdminAutenticado) {
-                mostrarVista('admin');
-                return;
-            }
+            if (esAdminAutenticado) { mostrarVista('admin'); return; }
             const passwordIngresada = prompt("⚠️ ACCESO RESTRINGIDO\nIntroduce la contraseña de Administrador:");
             if (passwordIngresada === CLAVE_ADMIN_SECRETA) {
                 esAdminAutenticado = true;
@@ -797,35 +758,68 @@
         }
 
         function mostrarVista(nombreVista) {
-            document.getElementById('vistaInicio').classList.remove('activa');
-            document.getElementById('vistaAuth').classList.remove('activa');
-            document.getElementById('vistaEstrenos').classList.remove('activa');
-            document.getElementById('vistaAdmin').classList.remove('activa');
+            if (usuarioActivo && verificarExpiracionSesionActual()) return;
 
-            const enlaces = document.querySelectorAll('.nav-link');
-            enlaces[0].classList.remove('active');
-            enlaces[1].classList.remove('active');
+            ['vistaInicio', 'vistaAuth', 'vistaEstrenos', 'vistaSeries', 'vistaAnimes', 'vistaAdmin'].forEach(id => {
+                document.getElementById(id).classList.remove('activa');
+            });
+
+            const navLinksItems = document.querySelectorAll('.nav-link');
+            navLinksItems.forEach(link => link.classList.remove('active'));
 
             if (nombreVista === 'inicio') {
                 document.getElementById('vistaInicio').classList.add('activa');
-                enlaces[0].classList.add('active');
+                navLinksItems[0].classList.add('active');
+                
+                const alertaBox = document.getElementById('alertaMembresia');
+                if (usuarioActivo) {
+                    const usuario = dbUsuarios.find(u => u.email.toLowerCase() === usuarioActivo.toLowerCase());
+                    if (usuario) {
+                        const dias = calcularDiasRestantes(usuario.registroTime);
+                        const textoP = document.getElementById('alertaTexto');
+                        const tituloH3 = document.getElementById('alertaTitulo');
+                        
+                        if (dias <= 7 && dias > 0) {
+                            alertaBox.style.display = 'flex';
+                            tituloH3.textContent = "⚠️ Tu membresía está por vencer";
+                            textoP.textContent = `Te quedan ${dias} día(s) de acceso. Contacta al administrador para renovar tu mensualidad.`;
+                        } else if (dias <= 0) {
+                            alertaBox.style.display = 'flex';
+                            tituloH3.textContent = "❌ Membresía Expirada";
+                            textoP.textContent = `Tu plazo de 30 días ha finalizado.`;
+                        } else {
+                            alertaBox.style.display = 'none';
+                        }
+                    }
+                } else {
+                    alertaBox.style.display = 'none';
+                }
             } else if (nombreVista === 'auth') {
                 document.getElementById('vistaAuth').classList.add('activa');
             } else if (nombreVista === 'estrenos') {
                 document.getElementById('vistaEstrenos').classList.add('activa');
-                enlaces[1].classList.add('active');
+                navLinksItems[1].classList.add('active');
+            } else if (nombreVista === 'series') {
+                document.getElementById('vistaSeries').classList.add('activa');
+                navLinksItems[2].classList.add('active');
+            } else if (nombreVista === 'animes') {
+                document.getElementById('vistaAnimes').classList.add('activa');
+                navLinksItems[3].classList.add('active');
             } else if (nombreVista === 'admin') {
                 document.getElementById('vistaAdmin').classList.add('activa');
             }
             window.scrollTo(0, 0);
+            setTimeout(() => SpatialNavigation.makeFocusable(), 100);
         }
 
-        function accederEstrenos() {
-            if (usuarioActivo) {
-                mostrarVista('estrenos');
+        function accederSeccionProtegida(seccion) {
+            if (usuarioActivo) { 
+                if (!verificarExpiracionSesionActual()) {
+                    mostrarVista(seccion);
+                }
             } else {
-                modoFormulario('login');
-                mostrarVista('auth');
+                modoFormulario('login'); 
+                mostrarVista('auth'); 
             }
         }
 
@@ -840,8 +834,9 @@
             contenedor.innerHTML = '';
             lista.forEach(item => {
                 const div = document.createElement('div');
-                div.className = 'tarjeta-carrusel';
+                div.className = 'tarjeta-carrusel focusable';
                 div.setAttribute('tabindex', '0');
+                div.onclick = () => { accederSeccionProtegida('estrenos'); };
                 div.innerHTML = `
                     <div class="contenedor-imagen-hover">
                         <img src="${item.imgPrincipal}" class="img-principal" onerror="this.src='https://via.placeholder.com/220x310?text=Poster'">
@@ -851,6 +846,30 @@
                 `;
                 contenedor.appendChild(div);
             });
+            SpatialNavigation.makeFocusable();
+        }
+
+        function pintarCatalogo(idGrid, lista, storageKey) {
+            const grid = document.getElementById(idGrid);
+            grid.innerHTML = '';
+            lista.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'tarjeta-catalogo';
+                div.innerHTML = `
+                    <img src="${p.imagen}">
+                    <div class="tarjeta-catalogo-info">
+                        <div class="tarjeta-catalogo-titulo">${p.titulo}</div>
+                        <div class="tarjeta-catalogo-meta">${p.meta}</div>
+                        <div class="tarjeta-catalogo-desc">${p.desc}</div>
+                    </div>
+                    <div class="tarjeta-catalogo-botones">
+                        <button class="btn-tarjeta btn-ver-catalogo focusable" onclick="reproducir('${p.video}', '${p.titulo}')" tabindex="0">▶ Ver</button>
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+            localStorage.setItem(storageKey, JSON.stringify(lista));
+            SpatialNavigation.makeFocusable();
         }
 
         function cambiarTabAdmin(tabId) {
@@ -858,8 +877,10 @@
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
             event.target.classList.add('active');
             document.getElementById(tabId).classList.add('active');
+            SpatialNavigation.makeFocusable();
         }
 
+        /* --- ADMINISTRACIÓN DE CARRUSELES --- */
         function guardarItemCarrusel(e) {
             e.preventDefault();
             const editId = document.getElementById('carruselEditId').value;
@@ -870,12 +891,9 @@
 
             if (editId) {
                 let item = carruselesData[tipo].find(i => i.id == editId);
-                if (item) {
-                    item.titulo = titulo;
-                    item.imgPrincipal = imgPrincipal;
-                    item.imgHover = imgHover;
-                }
+                if (item) { item.titulo = titulo; item.imgPrincipal = imgPrincipal; item.imgHover = imgHover; }
                 document.getElementById('carruselEditId').value = '';
+                document.getElementById('tituloFormCarrusel').textContent = "Añadir / Editar Elemento en Carrusel";
             } else {
                 const nuevoItem = { id: Date.now(), titulo, imgPrincipal, imgHover };
                 carruselesData[tipo].push(nuevoItem);
@@ -900,20 +918,21 @@
                             <img src="${item.imgPrincipal}">
                             <div>
                                 <strong>${item.titulo}</strong>
-                                <div style="font-size:0.75rem; color:#888;">Categoría: ${cat}</div>
+                                <div style="font-size:0.75rem; color:#888;">Carrusel: ${cat}</div>
                             </div>
                         </div>
-                        <div>
-                            <button class="btn-tarjeta" style="background:#555; color:#fff;" onclick="cargarEdicionCarrusel('${cat}', ${item.id})">Editar</button>
-                            <button class="btn-tarjeta btn-borrar-estreno" onclick="borrarItemCarrusel('${cat}', ${item.id})">Borrar</button>
+                        <div style="display:flex; gap:5px;">
+                            <button class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="editarItemCarrusel('${cat}', ${item.id})" tabindex="0">Editar</button>
+                            <button class="btn-tarjeta btn-borrar-estreno focusable" style="background:#333; color:#ff4d4d;" onclick="borrarItemCarrusel('${cat}', ${item.id})" tabindex="0">Borrar</button>
                         </div>
                     `;
                     cont.appendChild(row);
                 });
             });
+            SpatialNavigation.makeFocusable();
         }
 
-        function cargarEdicionCarrusel(cat, id) {
+        function editarItemCarrusel(cat, id) {
             const item = carruselesData[cat].find(i => i.id === id);
             if (item) {
                 document.getElementById('carruselEditId').value = item.id;
@@ -921,12 +940,18 @@
                 document.getElementById('carruselTitulo').value = item.titulo;
                 document.getElementById('carruselImgPrincipal').value = item.imgPrincipal;
                 document.getElementById('carruselImgHover').value = item.imgHover;
+                document.getElementById('tituloFormCarrusel').textContent = `Editando elemento en: ${cat}`;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
 
+        function limpiarFormCarrusel() {
+            document.getElementById('carruselEditId').value = '';
+            document.getElementById('tituloFormCarrusel').textContent = "Añadir / Editar Elemento en Carrusel";
+        }
+
         function borrarItemCarrusel(cat, id) {
-            if (confirm('¿Eliminar este elemento?')) {
+            if (confirm('¿Eliminar este elemento del carrusel?')) {
                 carruselesData[cat] = carruselesData[cat].filter(i => i.id !== id);
                 localStorage.setItem('carruseles_db', JSON.stringify(carruselesData));
                 cargarCarruseles();
@@ -934,59 +959,193 @@
             }
         }
 
-        function renderizarEstrenosAdmin() {
-            const cont = document.getElementById('listaEstrenosAdmin');
+        /* --- ADMINISTRACIÓN DE CONTENIDO --- */
+        function getDatabaseAndKey(tipo) {
+            if (tipo === 'estrenos') return { lista: peliculasEstreno, key: 'estrenos_db', grid: 'gridEstrenos' };
+            if (tipo === 'series') return { lista: seriesCatalogo, key: 'series_db', grid: 'gridSeries' };
+            if (tipo === 'animes') return { lista: animesCatalogo, key: 'animes_db', grid: 'gridAnimes' };
+        }
+
+        function guardarContenido(e, tipo) {
+            e.preventDefault();
+            const { lista, key, grid } = getDatabaseAndKey(tipo);
+            const editId = document.getElementById(`edit${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Id`).value;
+            
+            let url = document.getElementById(`input${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Video`).value;
+            if (url.includes('drive.google.com')) {
+                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+                if (match && match[1]) url = `https://drive.google.com/file/d/${match[1]}/preview`;
+            }
+
+            const titulo = document.getElementById(`input${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Titulo`).value;
+            const meta = document.getElementById(`input${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Meta`).value;
+            const imagen = document.getElementById(`input${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Imagen`).value;
+            const desc = document.getElementById(`input${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Desc`).value;
+
+            if (editId) {
+                let item = lista.find(i => i.id == editId);
+                if (item) { item.titulo = titulo; item.meta = meta; item.imagen = imagen; item.video = url; item.desc = desc; }
+            } else {
+                lista.push({ id: Date.now(), titulo, meta, imagen, video: url, desc });
+            }
+
+            pintarCatalogo(grid, lista, key);
+            renderizarContenidoAdmin(tipo);
+            limpiarFormulario(tipo);
+            alert('¡Guardado exitosamente!');
+        }
+
+        function renderizarContenidoAdmin(tipo) {
+            const { lista } = getDatabaseAndKey(tipo);
+            const cont = document.getElementById(`lista${tipo.charAt(0).toUpperCase() + tipo.slice(1)}Admin`);
             cont.innerHTML = '';
-            peliculasEstreno.forEach(p => {
+            lista.forEach(item => {
                 const row = document.createElement('div');
                 row.className = 'item-row-admin';
                 row.innerHTML = `
                     <div class="item-info-admin">
-                        <img src="${p.imagen}">
+                        <img src="${item.imagen}">
                         <div>
-                            <strong>${p.titulo}</strong>
-                            <div style="font-size:0.75rem; color:#888;">${p.meta}</div>
+                            <strong>${item.titulo}</strong>
+                            <div style="font-size:0.75rem; color:#888;">${item.meta}</div>
                         </div>
                     </div>
-                    <div>
-                        <button class="btn-tarjeta" style="background:#555; color:#fff;" onclick="editarEstreno(${p.id})">Editar</button>
-                        <button class="btn-tarjeta btn-borrar-estreno" onclick="borrarEstreno(${p.id})">Borrar</button>
+                    <div style="display:flex; gap:5px;">
+                        <button class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="editarContenido('${tipo}', ${item.id})" tabindex="0">Editar</button>
+                        <button class="btn-tarjeta btn-borrar-estreno focusable" style="background:#333; color:#ff4d4d;" onclick="borrarContenido('${tipo}', ${item.id})" tabindex="0">Borrar</button>
                     </div>
                 `;
                 cont.appendChild(row);
             });
+            SpatialNavigation.makeFocusable();
+        }
+
+        function editarContenido(tipo, id) {
+            const { lista } = getDatabaseAndKey(tipo);
+            const item = lista.find(i => i.id === id);
+            const cap = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+            if (item) {
+                document.getElementById(`edit${cap}Id`).value = item.id;
+                document.getElementById(`input${cap}Titulo`).value = item.titulo;
+                document.getElementById(`input${cap}Meta`).value = item.meta;
+                document.getElementById(`input${cap}Imagen`).value = item.imagen;
+                document.getElementById(`input${cap}Video`).value = item.video;
+                document.getElementById(`input${cap}Desc`).value = item.desc;
+                document.getElementById(`tituloForm${cap}`).textContent = `Editando: ${item.titulo}`;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        function limpiarFormulario(tipo) {
+            const cap = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+            document.getElementById(`edit${cap}Id`).value = '';
+            document.getElementById(`tituloForm${cap}`).textContent = `Añadir Nuevo ${cap.slice(0, -1)}`;
+        }
+
+        function borrarContenido(tipo, id) {
+            const { lista, key, grid } = getDatabaseAndKey(tipo);
+            if (confirm('¿Estás seguro de eliminar este elemento?')) {
+                const index = lista.findIndex(i => i.id === id);
+                if (index !== -1) {
+                    lista.splice(index, 1);
+                    pintarCatalogo(grid, lista, key);
+                    renderizarContenidoAdmin(tipo);
+                }
+            }
+        }
+
+        /* --- ADMINISTRACIÓN DE USUARIOS & CONTROL DE 30 DÍAS --- */
+        function calcularDiasRestantes(registroTime) {
+            if (!registroTime) return 30;
+            const treintaDiasMs = 30 * 24 * 60 * 60 * 1000;
+            const tiempoTranscurrido = Date.now() - registroTime;
+            const tiempoRestante = treintaDiasMs - tiempoTranscurrido;
+            const diasRestantes = Math.ceil(tiempoRestante / (24 * 60 * 60 * 1000));
+            return diasRestantes;
         }
 
         function renderizarTablaUsuarios() {
             const tbody = document.getElementById('tablaUsuariosBody');
             tbody.innerHTML = '';
             dbUsuarios.forEach((u, index) => {
+                const dias = calcularDiasRestantes(u.registroTime);
+                let estadoHTML = '';
+
+                if (dias > 0) {
+                    estadoHTML = `<span style="color: #46d369; font-weight: bold;">Activo (${dias} días restantes)</span>`;
+                } else {
+                    estadoHTML = `<span style="color: #ff4d4d; font-weight: bold;">⚠️ Vencido (Expirado)</span>`;
+                }
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td>${u.email}</td>
                     <td><code>${u.pass}</code></td>
-                    <td><button class="btn-tarjeta btn-borrar-estreno" onclick="borrarUsuario('${u.email}')">Eliminar</button></td>
+                    <td>${estadoHTML}</td>
+                    <td>
+                        <button class="btn-tarjeta focusable" style="background:#00d2ff; color:#000;" onclick="renovarMembresia('${u.email}')" tabindex="0">Renovar (30d)</button>
+                        <button class="btn-tarjeta focusable" style="background:#555; color:#fff;" onclick="editarUsuario('${u.email}')" tabindex="0">Editar</button>
+                        <button class="btn-tarjeta btn-borrar-estreno focusable" style="background:#333; color:#ff4d4d;" onclick="borrarUsuario('${u.email}')" tabindex="0">Eliminar</button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
             localStorage.setItem('db_usuarios', JSON.stringify(dbUsuarios));
+            SpatialNavigation.makeFocusable();
+        }
+
+        function renovarMembresia(email) {
+            const usuario = dbUsuarios.find(u => u.email === email);
+            if (usuario) {
+                usuario.registroTime = Date.now();
+                renderizarTablaUsuarios();
+                alert(`¡Membresía renovada por 30 días más para ${usuario.email}!`);
+            }
+        }
+
+        function verificarExpiracionSesionActual() {
+            if (!usuarioActivo) return false;
+            const usuario = dbUsuarios.find(u => u.email.toLowerCase() === usuarioActivo.toLowerCase());
+            if (usuario) {
+                const dias = calcularDiasRestantes(usuario.registroTime);
+                if (dias <= 0) {
+                    alert("⚠️ Tu membresía de 30 días ha expirado y no ha sido renovada. Se cerrará tu sesión.");
+                    accionBotonSesion();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function editarUsuario(email) {
+            const usuario = dbUsuarios.find(u => u.email === email);
+            if (usuario) {
+                const nuevoPass = prompt(`Editar contraseña para ${usuario.email}:`, usuario.pass);
+                if (nuevoPass !== null && nuevoPass.trim() !== '') {
+                    usuario.pass = nuevoPass.trim();
+                    renderizarTablaUsuarios();
+                    alert('¡Contraseña actualizada con éxito!');
+                }
+            }
         }
 
         function borrarUsuario(email) {
-            if (confirm(`¿Eliminar usuario ${email}?`)) {
+            if (confirm(`¿Eliminar al usuario ${email}?`)) {
                 dbUsuarios = dbUsuarios.filter(u => u.email !== email);
                 renderizarTablaUsuarios();
             }
         }
 
+        /* --- AUTENTICACIÓN Y REPRODUCTOR --- */
         function modoFormulario(tipo) {
             esRegistro = (tipo === 'registro');
             document.getElementById('tituloAuth').textContent = esRegistro ? 'Registrarse' : 'Iniciar Sesión';
             document.getElementById('btnAuthSubmit').textContent = esRegistro ? 'Registrarse' : 'Entrar';
             document.getElementById('textoAuthSwitch').innerHTML = esRegistro 
-                ? '¿Ya tienes cuenta? <span onclick="modoFormulario(\'login\')" style="color:#fff; cursor:pointer; text-decoration:underline;">Inicia sesión</span>'
-                : '¿No tienes cuenta? <span onclick="modoFormulario(\'registro\')" style="color:#fff; cursor:pointer; text-decoration:underline;">Regístrate aquí</span>';
+                ? '¿Ya tienes cuenta? <span class="focusable" onclick="modoFormulario(\'login\')" style="color:#fff; cursor:pointer; text-decoration:underline;" tabindex="0">Inicia sesión</span>'
+                : '¿No tienes cuenta? <span class="focusable" onclick="modoFormulario(\'registro\')" style="color:#fff; cursor:pointer; text-decoration:underline;" tabindex="0">Regístrate aquí</span>';
+            SpatialNavigation.makeFocusable();
         }
 
         function procesarAuth(e) {
@@ -999,13 +1158,19 @@
                     alert('⚠️ El correo ya está registrado.');
                     return;
                 }
-                dbUsuarios.push({ email, pass });
+                dbUsuarios.push({ email, pass, registroTime: Date.now() });
                 renderizarTablaUsuarios();
-                alert('¡Registro exitoso!');
+                alert('¡Registro exitoso! Tienes 30 días de acceso.');
                 modoFormulario('login');
             } else {
                 const valido = dbUsuarios.find(u => u.email.toLowerCase() === email && u.pass === pass);
                 if (valido) {
+                    const dias = calcularDiasRestantes(valido.registroTime);
+                    if (dias <= 0) {
+                        alert('⚠️ Tu membresía de 30 días ha expirado. Por favor, contacta al administrador para renovar.');
+                        return;
+                    }
+
                     usuarioActivo = email;
                     document.getElementById('btnSesion').textContent = 'Cerrar Sesión';
                     document.getElementById('btnSesion').style.background = '#333';
@@ -1017,107 +1182,14 @@
         }
 
         function accionBotonSesion() {
-            if (usuarioActivo) {
-                usuarioActivo = null;
-                document.getElementById('btnSesion').textContent = 'Iniciar Sesión';
-                document.getElementById('btnSesion').style.background = '#E50914';
-                mostrarVista('inicio');
-            } else {
-                modoFormulario('login');
-                mostrarVista('auth');
-            }
-        }
-
-        function pintarEstrenos() {
-            const grid = document.getElementById('gridEstrenos');
-            grid.innerHTML = '';
-            peliculasEstreno.forEach(p => {
-                const div = document.createElement('div');
-                div.className = 'tarjeta-estreno';
-                div.innerHTML = `
-                    <img src="${p.imagen}">
-                    <div class="tarjeta-estreno-info">
-                        <div class="tarjeta-estreno-titulo">${p.titulo}</div>
-                        <div class="tarjeta-estreno-meta">${p.meta}</div>
-                        <div class="tarjeta-estreno-desc">${p.desc}</div>
-                    </div>
-                    <div class="tarjeta-estreno-botones">
-                        <button class="btn-tarjeta btn-ver-estreno" onclick="reproducir('${p.video}', '${p.titulo}')">▶ Ver</button>
-                    </div>
-                `;
-                grid.appendChild(div);
-            });
-            localStorage.setItem('estrenos_db', JSON.stringify(peliculasEstreno));
-        }
-
-        function abrirModalSubir() {
-            document.getElementById('editEstrenoId').value = '';
-            document.getElementById('modalSubirTitulo').textContent = 'Subir Nueva Película';
-            document.getElementById('modalSubir').style.display = 'flex';
-        }
-
-        function cerrarModalSubir() {
-            document.getElementById('modalSubir').style.display = 'none';
-        }
-
-        function guardarPelicula(e) {
-            e.preventDefault();
-            const editId = document.getElementById('editEstrenoId').value;
-            let url = document.getElementById('inputVideo').value;
-
-            if (url.includes('drive.google.com')) {
-                const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-                if (match && match[1]) url = `https://drive.google.com/file/d/${match[1]}/preview`;
-            }
-
-            if (editId) {
-                let p = peliculasEstreno.find(item => item.id == editId);
-                if (p) {
-                    p.titulo = document.getElementById('inputTitulo').value;
-                    p.meta = document.getElementById('inputMeta').value;
-                    p.imagen = document.getElementById('inputImagen').value;
-                    p.video = url;
-                    p.desc = document.getElementById('inputDesc').value;
-                }
-            } else {
-                peliculasEstreno.push({
-                    id: Date.now(),
-                    titulo: document.getElementById('inputTitulo').value,
-                    meta: document.getElementById('inputMeta').value,
-                    imagen: document.getElementById('inputImagen').value,
-                    video: url,
-                    desc: document.getElementById('inputDesc').value
-                });
-            }
-
-            cerrarModalSubir();
-            pintarEstrenos();
-            renderizarEstrenosAdmin();
-        }
-
-        function editarEstreno(id) {
-            const p = peliculasEstreno.find(item => item.id === id);
-            if (p) {
-                document.getElementById('editEstrenoId').value = p.id;
-                document.getElementById('inputTitulo').value = p.titulo;
-                document.getElementById('inputMeta').value = p.meta;
-                document.getElementById('inputImagen').value = p.imagen;
-                document.getElementById('inputVideo').value = p.video;
-                document.getElementById('inputDesc').value = p.desc;
-                document.getElementById('modalSubirTitulo').textContent = 'Editar Estreno';
-                document.getElementById('modalSubir').style.display = 'flex';
-            }
-        }
-
-        function borrarEstreno(id) {
-            if (confirm('¿Eliminar película?')) {
-                peliculasEstreno = peliculasEstreno.filter(p => p.id !== id);
-                pintarEstrenos();
-                renderizarEstrenosAdmin();
-            }
+            usuarioActivo = null;
+            document.getElementById('btnSesion').textContent = 'Iniciar Sesión';
+            document.getElementById('btnSesion').style.background = '#E50914';
+            mostrarVista('inicio');
         }
 
         function reproducir(url, titulo) {
+            if (verificarExpiracionSesionActual()) return;
             document.getElementById('tituloReproductor').textContent = titulo;
             const caja = document.getElementById('contenedorReproductor');
             if (url.includes('drive.google.com') || url.includes('preview')) {
@@ -1126,11 +1198,13 @@
                 caja.innerHTML = `<video src="${url}" controls autoplay></video>`;
             }
             document.getElementById('modalReproductor').style.display = 'flex';
+            SpatialNavigation.makeFocusable();
         }
 
         function cerrarReproductor() {
             document.getElementById('contenedorReproductor').innerHTML = '';
             document.getElementById('modalReproductor').style.display = 'none';
+            SpatialNavigation.makeFocusable();
         }
     </script>
 </body>
